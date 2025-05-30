@@ -140,12 +140,12 @@ export function JobFilters({ filters, onFiltersChange, userRole, companies = [] 
           </div>
           <div>
             <Label htmlFor="type">Job Type</Label>
-            <Select value={filters.type} onValueChange={(value) => updateFilter('type', value)}>
+            <Select value={filters.type} onValueChange={(value) => updateFilter('type', value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All types</SelectItem>
+                <SelectItem value="all">All types</SelectItem>
                 <SelectItem value="full-time">Full-time</SelectItem>
                 <SelectItem value="part-time">Part-time</SelectItem>
                 <SelectItem value="contract">Contract</SelectItem>
@@ -201,12 +201,12 @@ export function JobFilters({ filters, onFiltersChange, userRole, companies = [] 
               {companies.length > 0 && (
                 <div>
                   <Label htmlFor="company">Company</Label>
-                  <Select value={filters.company} onValueChange={(value) => updateFilter('company', value)}>
+                  <Select value={filters.company} onValueChange={(value) => updateFilter('company', value === 'all' ? '' : value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="All companies" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All companies</SelectItem>
+                      <SelectItem value="all">All companies</SelectItem>
                       {companies.map((company) => (
                         <SelectItem key={company.id} value={company.id}>
                           {company.name}
@@ -218,12 +218,12 @@ export function JobFilters({ filters, onFiltersChange, userRole, companies = [] 
               )}
               <div>
                 <Label htmlFor="status">Status</Label>
-                <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
+                <Select value={filters.status} onValueChange={(value) => updateFilter('status', value === 'all' ? '' : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="All statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All statuses</SelectItem>
+                    <SelectItem value="all">All statuses</SelectItem>
                     {getStatusOptions().map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}

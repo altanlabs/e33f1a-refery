@@ -5,6 +5,9 @@ import { SignupForm } from "./components/auth/SignupForm";
 import Index from "./pages/index";
 import Dashboard from "./pages/Dashboard";
 import JobBoard from "./pages/JobBoard";
+import JobsManagement from "./pages/JobsManagement";
+import Companies from "./pages/Companies";
+import NewJob from "./pages/NewJob";
 import ReferralForm from "./pages/ReferralForm";
 import NotFound from "./pages/NotFound";
 
@@ -33,10 +36,26 @@ const routes = [
         ),
       },
       {
+        path: "companies",
+        element: (
+          <ProtectedRoute>
+            <Companies />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "jobs",
         element: (
           <ProtectedRoute>
-            <JobBoard />
+            <JobsManagement />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "jobs/new",
+        element: (
+          <ProtectedRoute>
+            <NewJob />
           </ProtectedRoute>
         ),
       },
