@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import NumberFlow from "@number-flow/react";
 import { 
   Users, 
   Briefcase, 
@@ -93,10 +94,10 @@ export default function App() {
   ];
 
   const stats = [
-    { label: 'Active Premium Jobs', value: '2,500+', icon: Briefcase },
-    { label: 'Successful Placements', value: '15,000+', icon: CheckCircle },
-    { label: 'Total Rewards Paid', value: '$50M+', icon: DollarSign },
-    { label: 'Average Reward', value: '$12,500', icon: Award },
+    { label: 'Active Premium Jobs', value: 2500, icon: Briefcase },
+    { label: 'Successful Placements', value: 15000, icon: CheckCircle },
+    { label: 'Total Rewards Paid', value: 50000000, icon: DollarSign },
+    { label: 'Average Reward', value: 12500, icon: Award },
   ];
 
   const testimonials = [
@@ -183,7 +184,17 @@ export default function App() {
                   <CardContent className="p-6 text-center">
                     <Icon className="h-8 w-8 mx-auto mb-3 text-purple-600 dark:text-purple-400" />
                     <div className="text-3xl font-black text-gray-900 dark:text-white mb-1">
-                      {stat.value}
+                      <NumberFlow 
+                        value={stat.value} 
+                        format={{
+                          style: 'decimal',
+                          notation: stat.value >= 1000000 ? 'compact' : 'standard',
+                          compactDisplay: 'short'
+                        }}
+                        suffix={stat.label === 'Total Rewards Paid' ? '+' : '+'}
+                        prefix={stat.label === 'Total Rewards Paid' || stat.label === 'Average Reward' ? '$' : ''}
+                        trend={true}
+                      />
                     </div>
                     <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       {stat.label}
@@ -223,7 +234,7 @@ export default function App() {
                     <div className={`mx-auto w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-shadow duration-300`}>
                       <Icon className="h-8 w-8 text-white" />
                     </div>
-                    <CardTitle className="text-xl font-bold text-center text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-pink-600 group-hover:bg-clip-text transition-all duration-300">
+                    <CardTitle className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-pink-600 group-hover:bg-clip-text transition-all duration-300">
                       {feature.title}
                     </CardTitle>
                   </CardHeader>
