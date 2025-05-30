@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAppStore } from '@/store';
+import { authApi } from '@/lib/api';
 import { User } from '@/types';
 import { Loader2 } from 'lucide-react';
 
@@ -89,20 +89,26 @@ export function SignupForm() {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const newUser: User = {
-        id: Date.now().toString(),
-        email: data.email,
+      const { user } = await authApi.signUp(data.email, data.password, {
         name: data.name,
         role: data.role,
-        createdAt: new Date().toISOString(),
-      };
+      });
 
-      login(newUser);
-      navigate('/onboarding');
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+      if (user) {
+        const userData: User = {
+          id: user.id,
+          email: user.email || '',
+          name: data.name,
+          role: data.role,
+          createdAt: new Date().toISOString(),
+        };
+
+        login(userData);
+        navigate('/dashboard');
+      }
+    } catch (err: any) {
+      console.error('Signup error:', err);
+      setError(err.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }

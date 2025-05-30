@@ -3,16 +3,9 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAppStore } from '@/store';
-import { 
-  mockJobs, 
-  mockReferrals, 
-  mockApplications, 
-  mockCompanies,
-  getReferralsWithRelations,
-  getApplicationsWithRelations 
-} from '@/lib/mockData';
+import { jobApi, referralApi, applicationApi, companyApi } from '@/lib/api';
 import { 
   Briefcase, 
   Users, 
@@ -21,7 +14,8 @@ import {
   Plus,
   Eye,
   Calendar,
-  Award
+  Award,
+  Loader2
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -29,99 +23,135 @@ export default function Dashboard() {
   const { auth } = useAppStore();
   const [stats, setStats] = useState<any>({});
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    // Load mock data and calculate stats based on user role
-    if (!auth.user) return;
-
-    const userRole = auth.user.role;
-    let calculatedStats = {};
-    let activity: any[] = [];
-
-    switch (userRole) {
-      case 'poster':
-        const userJobs = mockJobs.filter(job => job.companyId === '1'); // Assuming user owns company 1
-        const totalCandidates = mockReferrals.length + mockApplications.length;
-        const interviewingCount = mockReferrals.filter(r => r.status === 'interviewing').length;
-        
-        calculatedStats = {
-          activeJobs: userJobs.filter(j => j.status === 'active').length,
-          totalCandidates,
-          interviewsScheduled: interviewingCount,
-          hiredCandidates: mockReferrals.filter(r => r.status === 'hired').length,
-        };
-
-        activity = getReferralsWithRelations()
-          .slice(0, 5)
-          .map(referral => ({
-            type: 'referral',
-            title: `New referral for ${referral.job?.title}`,
-            description: `${referral.candidate?.name} referred by ${referral.referrer?.name}`,
-            time: referral.createdAt,
-            status: referral.status,
-          }));
-        break;
-
-      case 'referrer':
-        const userReferrals = mockReferrals.filter(r => r.referrerId === auth.user?.id);
-        const totalEarnings = userReferrals
-          .filter(r => r.rewardStatus === 'released')
-          .reduce((sum, r) => {
-            const job = mockJobs.find(j => j.id === r.jobId);
-            return sum + (job?.rewardAmount || 0);
-          }, 0);
-        
-        calculatedStats = {
-          totalReferrals: userReferrals.length,
-          pendingRewards: userReferrals.filter(r => r.rewardStatus === 'pending').length,
-          totalEarnings,
-          successfulHires: userReferrals.filter(r => r.status === 'hired').length,
-        };
-
-        activity = userReferrals
-          .slice(0, 5)
-          .map(referral => {
-            const job = mockJobs.find(j => j.id === referral.jobId);
-            const candidate = mockReferrals.find(r => r.id === referral.id)?.candidate;
-            return {
-              type: 'status_update',
-              title: `Referral status updated`,
-              description: `${candidate?.name || 'Candidate'} for ${job?.title} - ${referral.status}`,
-              time: referral.updatedAt,
-              status: referral.status,
-            };
-          });
-        break;
-
-      case 'candidate':
-        const userApplications = mockApplications.filter(a => a.candidateId === auth.user?.id);
-        
-        calculatedStats = {
-          totalApplications: userApplications.length,
-          inProgress: userApplications.filter(a => a.status === 'interviewing').length,
-          offers: userApplications.filter(a => a.status === 'offered').length,
-          rejections: userApplications.filter(a => a.status === 'rejected').length,
-        };
-
-        activity = getApplicationsWithRelations()
-          .filter(app => app.candidateId === auth.user?.id)
-          .slice(0, 5)
-          .map(application => ({
-            type: 'application',
-            title: `Application status updated`,
-            description: `${application.job?.title} at ${application.job?.company?.name} - ${application.status}`,
-            time: application.updatedAt,
-            status: application.status,
-          }));
-        break;
+    if (auth.user) {
+      loadDashboardData();
     }
-
-    setStats(calculatedStats);
-    setRecentActivity(activity);
   }, [auth.user]);
 
+  const loadDashboardData = async () => {
+    if (!auth.user) return;
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const userRole = auth.user.role;
+      let calculatedStats = {};
+      let activity: any[] = [];
+
+      switch (userRole) {
+        case 'poster':
+          const [jobs, referrals, applications] = await Promise.all([
+            jobApi.getAll(),
+            referralApi.getAll(),
+            applicationApi.getAll()
+          ]);
+
+          const userJobs = jobs; 
+          const totalCandidates = referrals.length + applications.length;
+          const interviewingCount = referrals.filter(r => r.status === 'Interviewing').length;
+          
+          calculatedStats = {
+            activeJobs: userJobs.filter(j => j.status === 'Open').length,
+            totalCandidates,
+            interviewsScheduled: interviewingCount,
+            hiredCandidates: referrals.filter(r => r.status === 'Hired').length,
+          };
+
+          activity = referrals
+            .slice(0, 5)
+            .map(referral => ({
+              type: 'referral',
+              title: `New referral for ${referral.job_data?.title || 'Unknown Job'}`,
+              description: `${referral.candidate_name} - ${referral.status}`,
+              time: referral.created_at,
+              status: referral.status,
+            }));
+          break;
+
+        case 'referrer':
+          const userReferrals = await referralApi.getAll();
+          const totalEarnings = userReferrals
+            .filter(r => r.reward_status === 'Released')
+            .reduce((sum, r) => {
+              return sum + (r.job_data?.reward_amount || 0);
+            }, 0);
+          
+          calculatedStats = {
+            totalReferrals: userReferrals.length,
+            pendingRewards: userReferrals.filter(r => r.reward_status === 'Pending').length,
+            totalEarnings,
+            successfulHires: userReferrals.filter(r => r.status === 'Hired').length,
+          };
+
+          activity = userReferrals
+            .slice(0, 5)
+            .map(referral => ({
+              type: 'status_update',
+              title: `Referral status updated`,
+              description: `${referral.candidate_name} for ${referral.job_data?.title || 'Unknown Job'} - ${referral.status}`,
+              time: referral.updated_at,
+              status: referral.status,
+            }));
+          break;
+
+        case 'candidate':
+          const userApplications = await applicationApi.getAll();
+          
+          calculatedStats = {
+            totalApplications: userApplications.length,
+            inProgress: userApplications.filter(a => a.status === 'Interviewing').length,
+            offers: userApplications.filter(a => a.status === 'Hired').length,
+            rejections: userApplications.filter(a => a.status === 'Rejected').length,
+          };
+
+          activity = userApplications
+            .slice(0, 5)
+            .map(application => ({
+              type: 'application',
+              title: `Application status updated`,
+              description: `${application.job_data?.title || 'Unknown Job'} - ${application.status}`,
+              time: application.updated_at,
+              status: application.status,
+            }));
+          break;
+      }
+
+      setStats(calculatedStats);
+      setRecentActivity(activity);
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+      setError('Failed to load dashboard data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!auth.user) {
-    return <div>Please log in to view your dashboard.</div>;
+    return (
+      <div className="container mx-auto py-6">
+        <Alert>
+          <AlertDescription>
+            Please log in to view your dashboard.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading dashboard...</span>
+        </div>
+      </div>
+    );
   }
 
   const getStatsCards = () => {
@@ -260,7 +290,6 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
@@ -275,7 +304,22 @@ export default function Dashboard() {
         </Badge>
       </div>
 
-      {/* Stats Cards */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {error}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={loadDashboardData}
+              className="ml-2"
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat, index) => {
           const Icon = stat.icon;
@@ -299,7 +343,6 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Quick Actions */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
@@ -327,7 +370,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>

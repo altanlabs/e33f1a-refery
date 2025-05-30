@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAppStore } from '@/store';
-import { mockUsers } from '@/lib/mockData';
+import { authApi } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -37,21 +37,24 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock authentication - find user by email
-      const user = mockUsers.find((u) => u.email === data.email);
+      const { user } = await authApi.signIn(data.email, data.password);
       
-      if (!user) {
-        setError('Invalid email or password');
-        return;
-      }
+      if (user) {
+        const userData = {
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+          role: user.user_metadata?.role || 'candidate',
+          avatar: user.user_metadata?.avatar,
+          createdAt: user.created_at || new Date().toISOString(),
+        };
 
-      login(user);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+        login(userData);
+        navigate('/dashboard');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -113,13 +116,11 @@ export function LoginForm() {
             </Link>
           </div>
           <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2">Demo Accounts:</p>
-            <div className="space-y-1 text-xs">
-              <p><strong>Poster:</strong> john@techcorp.com</p>
-              <p><strong>Referrer:</strong> sarah@venture.com</p>
-              <p><strong>Candidate:</strong> mike@developer.com</p>
-              <p className="text-muted-foreground">Password: any 6+ characters</p>
-            </div>
+            <p className="text-sm font-medium mb-2">Demo Mode:</p>
+            <p className="text-xs text-muted-foreground">
+              Create a new account or use any email/password combination to test the app.
+              The database is live and functional!
+            </p>
           </div>
         </CardContent>
       </Card>

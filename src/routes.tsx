@@ -5,6 +5,7 @@ import { SignupForm } from "./components/auth/SignupForm";
 import Index from "./pages/index";
 import Dashboard from "./pages/Dashboard";
 import JobBoard from "./pages/JobBoard";
+import ReferralForm from "./pages/ReferralForm";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component
@@ -44,6 +45,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <JobBoard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "refer/:jobId",
+        element: (
+          <ProtectedRoute>
+            <ReferralForm />
           </ProtectedRoute>
         ),
       },

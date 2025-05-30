@@ -3,13 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { JobCard } from '@/components/jobs/JobCard';
 import { JobFilters, JobFiltersState } from '@/components/jobs/JobFilters';
 import { useAppStore } from '@/store';
-import { mockJobs, mockCompanies, getJobsWithCompanies } from '@/lib/mockData';
-import { Job } from '@/types';
+import { jobApi, companyApi } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2 } from 'lucide-react';
 
 export default function JobBoard() {
   const { auth } = useAppStore();
   const navigate = useNavigate();
-  const [jobs, setJobs] = useState<(Job & { company?: any })[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [filters, setFilters] = useState<JobFiltersState>({
     search: '',
     location: '',
@@ -22,67 +27,78 @@ export default function JobBoard() {
   });
 
   useEffect(() => {
-    // Load jobs with company data
-    const jobsWithCompanies = getJobsWithCompanies();
-    setJobs(jobsWithCompanies);
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const [jobsData, companiesData] = await Promise.all([
+        jobApi.getAll(),
+        companyApi.getAll()
+      ]);
+      
+      const filteredJobs = jobsData.filter(job => job.status === 'Open');
+      
+      setJobs(filteredJobs);
+      setCompanies(companiesData);
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setError('Failed to load jobs. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredAndSortedJobs = useMemo(() => {
     let filtered = jobs.filter(job => {
-      // Only show active jobs for referrers and candidates
-      if (job.status !== 'active') return false;
-
-      // Search filter
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
         if (
-          !job.title.toLowerCase().includes(searchTerm) &&
-          !job.description.toLowerCase().includes(searchTerm) &&
-          !job.company?.name.toLowerCase().includes(searchTerm)
+          !job.title?.toLowerCase().includes(searchTerm) &&
+          !job.description?.toLowerCase().includes(searchTerm) &&
+          !job.company_data?.name?.toLowerCase().includes(searchTerm)
         ) {
           return false;
         }
       }
 
-      // Location filter
       if (filters.location) {
-        if (!job.location.toLowerCase().includes(filters.location.toLowerCase())) {
+        if (!job.location?.toLowerCase().includes(filters.location.toLowerCase())) {
           return false;
         }
       }
 
-      // Type filter
-      if (filters.type && job.type !== filters.type) {
+      if (filters.type && job.f_type !== filters.type) {
         return false;
       }
 
-      // Reward filters
-      if (filters.rewardMin && job.rewardAmount < parseInt(filters.rewardMin)) {
+      if (filters.rewardMin && job.reward_amount < parseInt(filters.rewardMin)) {
         return false;
       }
-      if (filters.rewardMax && job.rewardAmount > parseInt(filters.rewardMax)) {
+      if (filters.rewardMax && job.reward_amount > parseInt(filters.rewardMax)) {
         return false;
       }
 
-      // Company filter
-      if (filters.company && job.companyId !== filters.company) {
+      if (filters.company && job.company !== filters.company) {
         return false;
       }
 
       return true;
     });
 
-    // Sort jobs
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
         case 'newest':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         case 'oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         case 'reward-high':
-          return b.rewardAmount - a.rewardAmount;
+          return (b.reward_amount || 0) - (a.reward_amount || 0);
         case 'reward-low':
-          return a.rewardAmount - b.rewardAmount;
+          return (a.reward_amount || 0) - (b.reward_amount || 0);
         default:
           return 0;
       }
@@ -98,14 +114,32 @@ export default function JobBoard() {
   };
 
   if (!auth.user) {
-    return <div>Please log in to view jobs.</div>;
+    return (
+      <div className="container mx-auto py-6">
+        <Alert>
+          <AlertDescription>
+            Please log in to view jobs.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   const userRole = auth.user.role as 'referrer' | 'candidate';
 
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading jobs...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">
           {userRole === 'referrer' ? 'Job Board' : 'Job Opportunities'}
@@ -118,20 +152,37 @@ export default function JobBoard() {
         </p>
       </div>
 
-      {/* Filters */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {error}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={loadData}
+              className="ml-2"
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <JobFilters
         filters={filters}
         onFiltersChange={setFilters}
         userRole={userRole}
-        companies={mockCompanies}
+        companies={companies.map(c => ({ id: c.id, name: c.name }))}
       />
 
-      {/* Results */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
             Showing {filteredAndSortedJobs.length} of {jobs.length} jobs
           </p>
+          <Button variant="outline" onClick={loadData} size="sm">
+            Refresh
+          </Button>
         </div>
 
         {filteredAndSortedJobs.length > 0 ? (
@@ -139,7 +190,28 @@ export default function JobBoard() {
             {filteredAndSortedJobs.map((job) => (
               <JobCard
                 key={job.id}
-                job={job}
+                job={{
+                  id: job.id,
+                  title: job.title,
+                  description: job.description || '',
+                  location: job.location || '',
+                  type: job.f_type || 'Full-time',
+                  rewardAmount: job.reward_amount || 0,
+                  status: job.status === 'Open' ? 'active' : 'closed',
+                  requirements: job.requirements ? job.requirements.split('\n').filter(Boolean) : [],
+                  benefits: [],
+                  createdAt: job.created_at,
+                  closingDate: job.closing_date,
+                  companyId: job.company,
+                  company: job.company_data ? {
+                    id: job.company_data.id,
+                    name: job.company_data.name,
+                    logo: job.company_data.logo,
+                    website: job.company_data.website,
+                    description: job.company_data.description,
+                    createdAt: job.company_data.created_at
+                  } : undefined
+                }}
                 userRole={userRole}
                 onAction={handleJobAction}
               />
@@ -149,7 +221,10 @@ export default function JobBoard() {
           <div className="text-center py-12">
             <p className="text-lg font-medium">No jobs found</p>
             <p className="text-muted-foreground">
-              Try adjusting your filters to see more results.
+              {jobs.length === 0 
+                ? 'No jobs are currently available.' 
+                : 'Try adjusting your filters to see more results.'
+              }
             </p>
           </div>
         )}
