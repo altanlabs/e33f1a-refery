@@ -9,6 +9,9 @@ import JobsManagement from "./pages/JobsManagement";
 import Companies from "./pages/Companies";
 import NewJob from "./pages/NewJob";
 import ReferralForm from "./pages/ReferralForm";
+import MyReferrals from "./pages/MyReferrals";
+import MyApplications from "./pages/MyApplications";
+import Payouts from "./pages/Payouts";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component
@@ -72,6 +75,30 @@ const routes = [
         element: (
           <ProtectedRoute>
             <ReferralForm />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "my-referrals",
+        element: (
+          <ProtectedRoute>
+            <MyReferrals />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "my-applications",
+        element: (
+          <ProtectedRoute>
+            <MyApplications />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "payouts",
+        element: (
+          <ProtectedRoute>
+            <Payouts />
           </ProtectedRoute>
         ),
       },

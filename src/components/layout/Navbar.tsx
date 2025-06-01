@@ -40,7 +40,7 @@ export function Navbar() {
       case 'referrer':
         return [
           ...baseItems,
-          { href: '/jobs', label: 'Job Board', icon: Briefcase },
+          { href: '/opportunities', label: 'Job Board', icon: Briefcase },
           { href: '/my-referrals', label: 'My Referrals', icon: Users },
           { href: '/payouts', label: 'Payouts', icon: DollarSign },
         ];
