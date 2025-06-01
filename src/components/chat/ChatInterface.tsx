@@ -294,13 +294,6 @@ export function ChatInterface() {
                   <Send className="h-5 w-5 text-white" />
                 </Button>
               </div>
-              
-              <div className="flex items-center justify-center mt-2">
-                <Badge variant="outline" className="text-xs text-gray-500 dark:text-gray-400 bg-transparent border-gray-200 dark:border-gray-700">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Powered by Refery AI
-                </Badge>
-              </div>
             </div>
           </div>
         </SheetContent>
