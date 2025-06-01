@@ -151,6 +151,189 @@ export interface Database {
           status?: 'Applied' | 'Reviewing' | 'Interviewing' | 'Hired' | 'Rejected';
         };
       };
+      payouts: {
+        Row: {
+          id: string;
+          amount: number;
+          status: 'Pending' | 'Processing' | 'Completed' | 'Failed';
+          payment_method: 'Bank Transfer' | 'PayPal';
+          transaction_id?: string;
+          payout_date?: string;
+          referral: string;
+          created_at: string;
+          updated_at: string;
+          created_by: string;
+          updated_by: string;
+        };
+        Insert: {
+          amount: number;
+          status?: 'Pending' | 'Processing' | 'Completed' | 'Failed';
+          payment_method: 'Bank Transfer' | 'PayPal';
+          transaction_id?: string;
+          payout_date?: string;
+          referral: string;
+        };
+        Update: {
+          amount?: number;
+          status?: 'Pending' | 'Processing' | 'Completed' | 'Failed';
+          payment_method?: 'Bank Transfer' | 'PayPal';
+          transaction_id?: string;
+          payout_date?: string;
+          referral?: string;
+        };
+      };
     };
   };
 }
+
+// Helper functions for database operations
+export const dbHelpers = {
+  // Referrals
+  async getReferrals() {
+    const { data, error } = await supabase
+      .from('referrals')
+      .select(`
+        *,
+        job:jobs(
+          *,
+          company:companies(*)
+        )
+      `)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createReferral(referral: Database['public']['Tables']['referrals']['Insert']) {
+    const { data, error } = await supabase
+      .from('referrals')
+      .insert(referral)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateReferral(id: string, updates: Database['public']['Tables']['referrals']['Update']) {
+    const { data, error } = await supabase
+      .from('referrals')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Payouts
+  async getPayouts() {
+    const { data, error } = await supabase
+      .from('payouts')
+      .select(`
+        *,
+        referral:referrals(
+          *,
+          job:jobs(
+            *,
+            company:companies(*)
+          )
+        )
+      `)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createPayout(payout: Database['public']['Tables']['payouts']['Insert']) {
+    const { data, error } = await supabase
+      .from('payouts')
+      .insert(payout)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updatePayout(id: string, updates: Database['public']['Tables']['payouts']['Update']) {
+    const { data, error } = await supabase
+      .from('payouts')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Applications
+  async getApplications() {
+    const { data, error } = await supabase
+      .from('applications')
+      .select(`
+        *,
+        job:jobs(
+          *,
+          company:companies(*)
+        )
+      `)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createApplication(application: Database['public']['Tables']['applications']['Insert']) {
+    const { data, error } = await supabase
+      .from('applications')
+      .insert(application)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateApplication(id: string, updates: Database['public']['Tables']['applications']['Update']) {
+    const { data, error } = await supabase
+      .from('applications')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Jobs
+  async getJobs() {
+    const { data, error } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        company:companies(*)
+      `)
+      .eq('status', 'Open')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Companies
+  async getCompanies() {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .order('name');
+    
+    if (error) throw error;
+    return data;
+  }
+};

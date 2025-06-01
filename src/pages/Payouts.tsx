@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,195 +23,88 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Settings,
-  Plus
+  Plus,
+  Loader2
 } from 'lucide-react';
 import { useAppStore } from '@/store';
-import { Payout } from '@/types';
+import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
-// Mock data for demonstration
-const mockPayouts: Payout[] = [
-  {
-    id: '1',
-    referralId: 'ref-1',
-    referral: {
-      id: 'ref-1',
-      jobId: 'job-1',
-      job: {
-        id: 'job-1',
-        companyId: 'comp-1',
-        company: { id: 'comp-1', name: 'TechCorp', logo: '', website: 'techcorp.com', createdAt: '2024-01-01' },
-        title: 'Senior Frontend Developer',
-        description: 'React, TypeScript, Next.js',
-        location: 'San Francisco, CA',
-        type: 'full-time',
-        rewardAmount: 8500,
-        status: 'active',
-        requirements: [],
-        benefits: [],
-        createdAt: '2024-01-01'
-      },
-      candidateId: 'cand-1',
-      candidate: {
-        id: 'cand-1',
-        name: 'Sarah Johnson',
-        email: 'sarah@example.com',
-        createdAt: '2024-01-01'
-      },
-      referrerId: 'ref-1',
-      status: 'hired',
-      introNote: 'Great candidate',
-      rewardStatus: 'released',
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-20T14:30:00Z'
-    },
-    amount: 8500,
-    status: 'completed',
-    method: 'bank',
-    createdAt: '2024-01-25T10:00:00Z',
-    processedAt: '2024-01-26T15:30:00Z'
-  },
-  {
-    id: '2',
-    referralId: 'ref-2',
-    referral: {
-      id: 'ref-2',
-      jobId: 'job-2',
-      job: {
-        id: 'job-2',
-        companyId: 'comp-2',
-        company: { id: 'comp-2', name: 'StartupXYZ', logo: '', website: 'startupxyz.com', createdAt: '2024-01-01' },
-        title: 'Product Manager',
-        description: 'B2B SaaS, Growth',
-        location: 'Remote',
-        type: 'full-time',
-        rewardAmount: 12000,
-        status: 'active',
-        requirements: [],
-        benefits: [],
-        createdAt: '2024-01-01'
-      },
-      candidateId: 'cand-2',
-      candidate: {
-        id: 'cand-2',
-        name: 'Michael Chen',
-        email: 'michael@example.com',
-        createdAt: '2024-01-01'
-      },
-      referrerId: 'ref-1',
-      status: 'hired',
-      introNote: 'Excellent PM',
-      rewardStatus: 'released',
-      createdAt: '2024-02-01T09:00:00Z',
-      updatedAt: '2024-02-05T16:45:00Z'
-    },
-    amount: 12000,
-    status: 'processing',
-    method: 'paypal',
-    createdAt: '2024-02-10T11:00:00Z'
-  },
-  {
-    id: '3',
-    referralId: 'ref-3',
-    referral: {
-      id: 'ref-3',
-      jobId: 'job-3',
-      job: {
-        id: 'job-3',
-        companyId: 'comp-3',
-        company: { id: 'comp-3', name: 'FinanceFlow', logo: '', website: 'financeflow.com', createdAt: '2024-01-01' },
-        title: 'Data Scientist',
-        description: 'Python, ML, Analytics',
-        location: 'New York, NY',
-        type: 'full-time',
-        rewardAmount: 10000,
-        status: 'active',
-        requirements: [],
-        benefits: [],
-        createdAt: '2024-01-01'
-      },
-      candidateId: 'cand-3',
-      candidate: {
-        id: 'cand-3',
-        name: 'Emily Rodriguez',
-        email: 'emily@example.com',
-        createdAt: '2024-01-01'
-      },
-      referrerId: 'ref-1',
-      status: 'hired',
-      introNote: 'Top data scientist',
-      rewardStatus: 'in-escrow',
-      createdAt: '2024-02-15T11:30:00Z',
-      updatedAt: '2024-02-20T09:15:00Z'
-    },
-    amount: 10000,
-    status: 'pending',
-    method: 'bank',
-    createdAt: '2024-02-25T14:20:00Z'
-  }
-];
-
 const statusConfig = {
-  'pending': { label: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  'processing': { label: 'Processing', color: 'bg-blue-100 text-blue-800', icon: ArrowUpRight },
-  'completed': { label: 'Completed', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  'failed': { label: 'Failed', color: 'bg-red-100 text-red-800', icon: XCircle }
+  'Pending': { label: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+  'Processing': { label: 'Processing', color: 'bg-blue-100 text-blue-800', icon: ArrowUpRight },
+  'Completed': { label: 'Completed', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+  'Failed': { label: 'Failed', color: 'bg-red-100 text-red-800', icon: XCircle }
 };
 
 const methodConfig = {
-  'bank': { label: 'Bank Transfer', icon: Building2 },
-  'paypal': { label: 'PayPal', icon: CreditCard }
+  'Bank Transfer': { label: 'Bank Transfer', icon: Building2 },
+  'PayPal': { label: 'PayPal', icon: CreditCard }
 };
 
 export default function Payouts() {
-  const { payouts } = useAppStore();
+  const [payouts, setPayouts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [methodFilter, setMethodFilter] = useState<string>('all');
 
-  // Use mock data for demonstration
-  const allPayouts = mockPayouts;
+  useEffect(() => {
+    loadPayouts();
+  }, []);
+
+  const loadPayouts = async () => {
+    try {
+      setLoading(true);
+      const data = await dbHelpers.getPayouts();
+      setPayouts(data || []);
+    } catch (error) {
+      console.error('Error loading payouts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredPayouts = useMemo(() => {
-    return allPayouts.filter(payout => {
+    return payouts.filter(payout => {
       const matchesSearch = 
-        payout.referral?.candidate?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        payout.referral?.job?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        payout.referral?.job?.company?.name.toLowerCase().includes(searchTerm.toLowerCase());
+        payout.referral?.candidate_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        payout.referral?.job?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        payout.referral?.job?.company?.name?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || payout.status === statusFilter;
-      const matchesMethod = methodFilter === 'all' || payout.method === methodFilter;
+      const matchesMethod = methodFilter === 'all' || payout.payment_method === methodFilter;
       
       return matchesSearch && matchesStatus && matchesMethod;
     });
-  }, [allPayouts, searchTerm, statusFilter, methodFilter]);
+  }, [payouts, searchTerm, statusFilter, methodFilter]);
 
   const stats = useMemo(() => {
-    const totalEarned = allPayouts
-      .filter(p => p.status === 'completed')
-      .reduce((sum, p) => sum + p.amount, 0);
+    const totalEarned = payouts
+      .filter(p => p.status === 'Completed')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
     
-    const pending = allPayouts
-      .filter(p => p.status === 'pending' || p.status === 'processing')
-      .reduce((sum, p) => sum + p.amount, 0);
+    const pending = payouts
+      .filter(p => p.status === 'Pending' || p.status === 'Processing')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
     
-    const thisMonth = allPayouts
+    const thisMonth = payouts
       .filter(p => {
-        const payoutDate = new Date(p.createdAt);
+        const payoutDate = new Date(p.created_at);
         const now = new Date();
         return payoutDate.getMonth() === now.getMonth() && 
                payoutDate.getFullYear() === now.getFullYear() &&
-               p.status === 'completed';
+               p.status === 'Completed';
       })
-      .reduce((sum, p) => sum + p.amount, 0);
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
     
-    const completedCount = allPayouts.filter(p => p.status === 'completed').length;
+    const completedCount = payouts.filter(p => p.status === 'Completed').length;
     
     return { totalEarned, pending, thisMonth, completedCount };
-  }, [allPayouts]);
+  }, [payouts]);
 
   const StatusBadge = ({ status }: { status: string }) => {
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['Pending'];
     const Icon = config.icon;
     
     return (
@@ -223,7 +116,7 @@ export default function Payouts() {
   };
 
   const MethodBadge = ({ method }: { method: string }) => {
-    const config = methodConfig[method as keyof typeof methodConfig];
+    const config = methodConfig[method as keyof typeof methodConfig] || methodConfig['Bank Transfer'];
     const Icon = config.icon;
     
     return (
@@ -233,6 +126,17 @@ export default function Payouts() {
       </Badge>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading payouts...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -346,10 +250,10 @@ export default function Payouts() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Processing">Processing</SelectItem>
+                    <SelectItem value="Completed">Completed</SelectItem>
+                    <SelectItem value="Failed">Failed</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -359,8 +263,8 @@ export default function Payouts() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Methods</SelectItem>
-                    <SelectItem value="bank">Bank Transfer</SelectItem>
-                    <SelectItem value="paypal">PayPal</SelectItem>
+                    <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="PayPal">PayPal</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -403,17 +307,17 @@ export default function Payouts() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {payout.referral?.candidate?.name}
+                                {payout.referral?.candidate_name || 'Unknown Candidate'}
                               </h3>
                               <span className="text-gray-400">•</span>
                               <span className="text-sm text-gray-600 dark:text-gray-400">
-                                {payout.referral?.job?.title}
+                                {payout.referral?.job?.title || 'Unknown Job'}
                               </span>
                             </div>
                             
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                               <Building2 className="h-4 w-4" />
-                              <span>{payout.referral?.job?.company?.name}</span>
+                              <span>{payout.referral?.job?.company?.name || 'Unknown Company'}</span>
                               <span>•</span>
                               <span>Payout ID: {payout.id}</span>
                             </div>
@@ -421,9 +325,9 @@ export default function Payouts() {
                             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                               <Calendar className="h-3 w-3" />
                               <span>
-                                Created {format(new Date(payout.createdAt), 'MMM d, yyyy')}
-                                {payout.processedAt && (
-                                  <span> • Processed {format(new Date(payout.processedAt), 'MMM d, yyyy')}</span>
+                                Created {format(new Date(payout.created_at), 'MMM d, yyyy')}
+                                {payout.payout_date && (
+                                  <span> • Processed {format(new Date(payout.payout_date), 'MMM d, yyyy')}</span>
                                 )}
                               </span>
                             </div>
@@ -434,20 +338,20 @@ export default function Payouts() {
                       {/* Right Section - Amount & Status */}
                       <div className="flex flex-col lg:items-end gap-3">
                         <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
-                          <StatusBadge status={payout.status} />
-                          <MethodBadge method={payout.method} />
+                          <StatusBadge status={payout.status || 'Pending'} />
+                          <MethodBadge method={payout.payment_method || 'Bank Transfer'} />
                         </div>
                         
                         <div className="text-right">
                           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                            ${payout.amount.toLocaleString()}
+                            ${payout.amount?.toLocaleString() || '0'}
                           </p>
-                          {payout.status === 'processing' && (
+                          {payout.status === 'Processing' && (
                             <p className="text-xs text-blue-600 dark:text-blue-400">
                               Processing...
                             </p>
                           )}
-                          {payout.status === 'pending' && (
+                          {payout.status === 'Pending' && (
                             <p className="text-xs text-yellow-600 dark:text-yellow-400">
                               Awaiting processing
                             </p>

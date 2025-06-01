@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,195 +21,77 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  XCircle
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import { useAppStore } from '@/store';
-import { Referral } from '@/types';
+import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
-// Mock data for demonstration
-const mockReferrals: Referral[] = [
-  {
-    id: '1',
-    jobId: 'job-1',
-    job: {
-      id: 'job-1',
-      companyId: 'comp-1',
-      company: { id: 'comp-1', name: 'TechCorp', logo: '', website: 'techcorp.com', createdAt: '2024-01-01' },
-      title: 'Senior Frontend Developer',
-      description: 'React, TypeScript, Next.js',
-      location: 'San Francisco, CA',
-      type: 'full-time',
-      rewardAmount: 8500,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-1',
-    candidate: {
-      id: 'cand-1',
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      linkedin: 'linkedin.com/in/sarahjohnson',
-      createdAt: '2024-01-01'
-    },
-    referrerId: 'ref-1',
-    status: 'interviewing',
-    introNote: 'Sarah is an exceptional developer with 5+ years of React experience.',
-    rewardStatus: 'in-escrow',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-20T14:30:00Z'
-  },
-  {
-    id: '2',
-    jobId: 'job-2',
-    job: {
-      id: 'job-2',
-      companyId: 'comp-2',
-      company: { id: 'comp-2', name: 'StartupXYZ', logo: '', website: 'startupxyz.com', createdAt: '2024-01-01' },
-      title: 'Product Manager',
-      description: 'B2B SaaS, Growth',
-      location: 'Remote',
-      type: 'full-time',
-      rewardAmount: 12000,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-2',
-    candidate: {
-      id: 'cand-2',
-      name: 'Michael Chen',
-      email: 'michael@example.com',
-      linkedin: 'linkedin.com/in/michaelchen',
-      createdAt: '2024-01-01'
-    },
-    referrerId: 'ref-1',
-    status: 'hired',
-    introNote: 'Michael has led product teams at 3 successful startups.',
-    rewardStatus: 'released',
-    createdAt: '2024-01-10T09:00:00Z',
-    updatedAt: '2024-01-25T16:45:00Z'
-  },
-  {
-    id: '3',
-    jobId: 'job-3',
-    job: {
-      id: 'job-3',
-      companyId: 'comp-3',
-      company: { id: 'comp-3', name: 'FinanceFlow', logo: '', website: 'financeflow.com', createdAt: '2024-01-01' },
-      title: 'Data Scientist',
-      description: 'Python, ML, Analytics',
-      location: 'New York, NY',
-      type: 'full-time',
-      rewardAmount: 10000,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-3',
-    candidate: {
-      id: 'cand-3',
-      name: 'Emily Rodriguez',
-      email: 'emily@example.com',
-      linkedin: 'linkedin.com/in/emilyrodriguez',
-      createdAt: '2024-01-01'
-    },
-    referrerId: 'ref-1',
-    status: 'viewed',
-    introNote: 'Emily has a PhD in Statistics and 4 years of industry experience.',
-    rewardStatus: 'pending',
-    createdAt: '2024-01-20T11:30:00Z',
-    updatedAt: '2024-01-22T09:15:00Z'
-  },
-  {
-    id: '4',
-    jobId: 'job-4',
-    job: {
-      id: 'job-4',
-      companyId: 'comp-4',
-      company: { id: 'comp-4', name: 'HealthTech', logo: '', website: 'healthtech.com', createdAt: '2024-01-01' },
-      title: 'UX Designer',
-      description: 'Figma, User Research',
-      location: 'Austin, TX',
-      type: 'full-time',
-      rewardAmount: 6500,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-4',
-    candidate: {
-      id: 'cand-4',
-      name: 'David Kim',
-      email: 'david@example.com',
-      linkedin: 'linkedin.com/in/davidkim',
-      createdAt: '2024-01-01'
-    },
-    referrerId: 'ref-1',
-    status: 'rejected',
-    introNote: 'David is a creative designer with strong user research skills.',
-    rewardStatus: 'pending',
-    createdAt: '2024-01-05T14:20:00Z',
-    updatedAt: '2024-01-18T10:30:00Z'
-  }
-];
-
 const statusConfig = {
-  'not-reviewed': { label: 'Not Reviewed', color: 'bg-gray-100 text-gray-800', icon: Clock },
-  'viewed': { label: 'Viewed', color: 'bg-blue-100 text-blue-800', icon: Eye },
-  'interviewing': { label: 'Interviewing', color: 'bg-yellow-100 text-yellow-800', icon: Users },
-  'rejected': { label: 'Rejected', color: 'bg-red-100 text-red-800', icon: XCircle },
-  'offered': { label: 'Offered', color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
-  'hired': { label: 'Hired', color: 'bg-green-100 text-green-800', icon: CheckCircle }
+  'Pending': { label: 'Not Reviewed', color: 'bg-gray-100 text-gray-800', icon: Clock },
+  'Reviewing': { label: 'Viewed', color: 'bg-blue-100 text-blue-800', icon: Eye },
+  'Interviewing': { label: 'Interviewing', color: 'bg-yellow-100 text-yellow-800', icon: Users },
+  'Rejected': { label: 'Rejected', color: 'bg-red-100 text-red-800', icon: XCircle },
+  'Hired': { label: 'Hired', color: 'bg-green-100 text-green-800', icon: CheckCircle }
 };
 
 const rewardStatusConfig = {
-  'pending': { label: 'Pending', color: 'bg-gray-100 text-gray-800', icon: Clock },
-  'in-escrow': { label: 'In Escrow', color: 'bg-blue-100 text-blue-800', icon: RefreshCw },
-  'released': { label: 'Released', color: 'bg-green-100 text-green-800', icon: CheckCircle }
+  'Pending': { label: 'Pending', color: 'bg-gray-100 text-gray-800', icon: Clock },
+  'In Escrow': { label: 'In Escrow', color: 'bg-blue-100 text-blue-800', icon: RefreshCw },
+  'Released': { label: 'Released', color: 'bg-green-100 text-green-800', icon: CheckCircle }
 };
 
 export default function MyReferrals() {
-  const { referrals } = useAppStore();
+  const [referrals, setReferrals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [rewardFilter, setRewardFilter] = useState<string>('all');
 
-  // Use mock data for demonstration
-  const allReferrals = mockReferrals;
+  useEffect(() => {
+    loadReferrals();
+  }, []);
+
+  const loadReferrals = async () => {
+    try {
+      setLoading(true);
+      const data = await dbHelpers.getReferrals();
+      setReferrals(data || []);
+    } catch (error) {
+      console.error('Error loading referrals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredReferrals = useMemo(() => {
-    return allReferrals.filter(referral => {
+    return referrals.filter(referral => {
       const matchesSearch = 
-        referral.candidate?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        referral.job?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        referral.job?.company?.name.toLowerCase().includes(searchTerm.toLowerCase());
+        referral.candidate_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        referral.job?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        referral.job?.company?.name?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || referral.status === statusFilter;
-      const matchesReward = rewardFilter === 'all' || referral.rewardStatus === rewardFilter;
+      const matchesReward = rewardFilter === 'all' || referral.reward_status === rewardFilter;
       
       return matchesSearch && matchesStatus && matchesReward;
     });
-  }, [allReferrals, searchTerm, statusFilter, rewardFilter]);
+  }, [referrals, searchTerm, statusFilter, rewardFilter]);
 
   const stats = useMemo(() => {
-    const total = allReferrals.length;
-    const hired = allReferrals.filter(r => r.status === 'hired').length;
-    const interviewing = allReferrals.filter(r => r.status === 'interviewing').length;
-    const totalEarnings = allReferrals
-      .filter(r => r.rewardStatus === 'released')
-      .reduce((sum, r) => sum + (r.job?.rewardAmount || 0), 0);
+    const total = referrals.length;
+    const hired = referrals.filter(r => r.status === 'Hired').length;
+    const interviewing = referrals.filter(r => r.status === 'Interviewing').length;
+    const totalEarnings = referrals
+      .filter(r => r.reward_status === 'Released')
+      .reduce((sum, r) => sum + (r.job?.reward_amount || 0), 0);
     
     return { total, hired, interviewing, totalEarnings };
-  }, [allReferrals]);
+  }, [referrals]);
 
   const StatusBadge = ({ status }: { status: string }) => {
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['Pending'];
     const Icon = config.icon;
     
     return (
@@ -221,7 +103,7 @@ export default function MyReferrals() {
   };
 
   const RewardBadge = ({ status }: { status: string }) => {
-    const config = rewardStatusConfig[status as keyof typeof rewardStatusConfig];
+    const config = rewardStatusConfig[status as keyof typeof rewardStatusConfig] || rewardStatusConfig['Pending'];
     const Icon = config.icon;
     
     return (
@@ -231,6 +113,17 @@ export default function MyReferrals() {
       </Badge>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading referrals...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -319,12 +212,11 @@ export default function MyReferrals() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="not-reviewed">Not Reviewed</SelectItem>
-                <SelectItem value="viewed">Viewed</SelectItem>
-                <SelectItem value="interviewing">Interviewing</SelectItem>
-                <SelectItem value="offered">Offered</SelectItem>
-                <SelectItem value="hired">Hired</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="Pending">Not Reviewed</SelectItem>
+                <SelectItem value="Reviewing">Viewed</SelectItem>
+                <SelectItem value="Interviewing">Interviewing</SelectItem>
+                <SelectItem value="Hired">Hired</SelectItem>
+                <SelectItem value="Rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
 
@@ -334,9 +226,9 @@ export default function MyReferrals() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Rewards</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in-escrow">In Escrow</SelectItem>
-                <SelectItem value="released">Released</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="In Escrow">In Escrow</SelectItem>
+                <SelectItem value="Released">Released</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -373,20 +265,19 @@ export default function MyReferrals() {
                   <div className="flex-1">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-12 w-12 border-2 border-gray-200 dark:border-gray-700">
-                        <AvatarImage src={referral.candidate?.avatar} />
                         <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                          {referral.candidate?.name.split(' ').map(n => n[0]).join('')}
+                          {referral.candidate_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            {referral.candidate?.name}
+                            {referral.candidate_name}
                           </h3>
-                          {referral.candidate?.linkedin && (
+                          {referral.candidate_linkedin && (
                             <Button variant="ghost" size="sm" className="h-6 w-6 p-0" asChild>
-                              <a href={referral.candidate.linkedin} target="_blank" rel="noopener noreferrer">
+                              <a href={referral.candidate_linkedin} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="h-3 w-3" />
                               </a>
                             </Button>
@@ -402,9 +293,11 @@ export default function MyReferrals() {
                           <span>{referral.job?.location}</span>
                         </div>
                         
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {referral.introNote}
-                        </p>
+                        {referral.recommendation && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                            {referral.recommendation}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -412,16 +305,16 @@ export default function MyReferrals() {
                   {/* Right Section - Status & Reward */}
                   <div className="flex flex-col lg:items-end gap-3">
                     <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
-                      <StatusBadge status={referral.status} />
-                      <RewardBadge status={referral.rewardStatus} />
+                      <StatusBadge status={referral.status || 'Pending'} />
+                      <RewardBadge status={referral.reward_status || 'Pending'} />
                     </div>
                     
                     <div className="text-right">
                       <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                        ${referral.job?.rewardAmount?.toLocaleString()}
+                        ${referral.job?.reward_amount?.toLocaleString() || '0'}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Referred {format(new Date(referral.createdAt), 'MMM d, yyyy')}
+                        Referred {format(new Date(referral.created_at), 'MMM d, yyyy')}
                       </p>
                     </div>
                   </div>

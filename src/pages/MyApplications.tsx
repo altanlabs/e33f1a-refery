@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,126 +18,67 @@ import {
   Clock,
   XCircle,
   FileText,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { useAppStore } from '@/store';
-import { Application } from '@/types';
+import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
-// Mock data for demonstration
-const mockApplications: Application[] = [
-  {
-    id: '1',
-    jobId: 'job-1',
-    job: {
-      id: 'job-1',
-      companyId: 'comp-1',
-      company: { id: 'comp-1', name: 'TechCorp', logo: '', website: 'techcorp.com', createdAt: '2024-01-01' },
-      title: 'Senior Frontend Developer',
-      description: 'React, TypeScript, Next.js',
-      location: 'San Francisco, CA',
-      type: 'full-time',
-      rewardAmount: 8500,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-1',
-    status: 'interviewing',
-    coverLetter: 'I am excited to apply for this position...',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-20T14:30:00Z'
-  },
-  {
-    id: '2',
-    jobId: 'job-2',
-    job: {
-      id: 'job-2',
-      companyId: 'comp-2',
-      company: { id: 'comp-2', name: 'StartupXYZ', logo: '', website: 'startupxyz.com', createdAt: '2024-01-01' },
-      title: 'Product Manager',
-      description: 'B2B SaaS, Growth',
-      location: 'Remote',
-      type: 'full-time',
-      rewardAmount: 12000,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-1',
-    status: 'viewed',
-    coverLetter: 'With my background in product management...',
-    createdAt: '2024-01-10T09:00:00Z',
-    updatedAt: '2024-01-12T16:45:00Z'
-  },
-  {
-    id: '3',
-    jobId: 'job-3',
-    job: {
-      id: 'job-3',
-      companyId: 'comp-3',
-      company: { id: 'comp-3', name: 'FinanceFlow', logo: '', website: 'financeflow.com', createdAt: '2024-01-01' },
-      title: 'Data Scientist',
-      description: 'Python, ML, Analytics',
-      location: 'New York, NY',
-      type: 'full-time',
-      rewardAmount: 10000,
-      status: 'active',
-      requirements: [],
-      benefits: [],
-      createdAt: '2024-01-01'
-    },
-    candidateId: 'cand-1',
-    status: 'rejected',
-    coverLetter: 'I have extensive experience in data science...',
-    createdAt: '2024-01-05T11:30:00Z',
-    updatedAt: '2024-01-08T09:15:00Z'
-  }
-];
-
 const statusConfig = {
-  'not-reviewed': { label: 'Not Reviewed', color: 'bg-gray-100 text-gray-800', icon: Clock },
-  'viewed': { label: 'Viewed', color: 'bg-blue-100 text-blue-800', icon: Eye },
-  'interviewing': { label: 'Interviewing', color: 'bg-yellow-100 text-yellow-800', icon: Users },
-  'rejected': { label: 'Rejected', color: 'bg-red-100 text-red-800', icon: XCircle },
-  'offered': { label: 'Offered', color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
-  'hired': { label: 'Hired', color: 'bg-green-100 text-green-800', icon: CheckCircle }
+  'Applied': { label: 'Applied', color: 'bg-gray-100 text-gray-800', icon: Clock },
+  'Reviewing': { label: 'Reviewing', color: 'bg-blue-100 text-blue-800', icon: Eye },
+  'Interviewing': { label: 'Interviewing', color: 'bg-yellow-100 text-yellow-800', icon: Users },
+  'Rejected': { label: 'Rejected', color: 'bg-red-100 text-red-800', icon: XCircle },
+  'Hired': { label: 'Hired', color: 'bg-green-100 text-green-800', icon: CheckCircle }
 };
 
 export default function MyApplications() {
-  const { applications } = useAppStore();
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  // Use mock data for demonstration
-  const allApplications = mockApplications;
+  useEffect(() => {
+    loadApplications();
+  }, []);
+
+  const loadApplications = async () => {
+    try {
+      setLoading(true);
+      const data = await dbHelpers.getApplications();
+      setApplications(data || []);
+    } catch (error) {
+      console.error('Error loading applications:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredApplications = useMemo(() => {
-    return allApplications.filter(application => {
+    return applications.filter(application => {
       const matchesSearch = 
-        application.job?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        application.job?.company?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        application.job?.location.toLowerCase().includes(searchTerm.toLowerCase());
+        application.job?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        application.job?.company?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        application.job?.location?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || application.status === statusFilter;
       
       return matchesSearch && matchesStatus;
     });
-  }, [allApplications, searchTerm, statusFilter]);
+  }, [applications, searchTerm, statusFilter]);
 
   const stats = useMemo(() => {
-    const total = allApplications.length;
-    const interviewing = allApplications.filter(a => a.status === 'interviewing').length;
-    const viewed = allApplications.filter(a => a.status === 'viewed').length;
-    const pending = allApplications.filter(a => a.status === 'not-reviewed').length;
+    const total = applications.length;
+    const interviewing = applications.filter(a => a.status === 'Interviewing').length;
+    const reviewing = applications.filter(a => a.status === 'Reviewing').length;
+    const pending = applications.filter(a => a.status === 'Applied').length;
     
-    return { total, interviewing, viewed, pending };
-  }, [allApplications]);
+    return { total, interviewing, reviewing, pending };
+  }, [applications]);
 
   const StatusBadge = ({ status }: { status: string }) => {
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['Applied'];
     const Icon = config.icon;
     
     return (
@@ -147,6 +88,17 @@ export default function MyApplications() {
       </Badge>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading applications...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -190,8 +142,8 @@ export default function MyApplications() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">Viewed</p>
-                <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.viewed}</p>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Reviewing</p>
+                <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.reviewing}</p>
               </div>
               <Eye className="h-8 w-8 text-green-500" />
             </div>
@@ -233,12 +185,11 @@ export default function MyApplications() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="not-reviewed">Not Reviewed</SelectItem>
-                <SelectItem value="viewed">Viewed</SelectItem>
-                <SelectItem value="interviewing">Interviewing</SelectItem>
-                <SelectItem value="offered">Offered</SelectItem>
-                <SelectItem value="hired">Hired</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="Applied">Applied</SelectItem>
+                <SelectItem value="Reviewing">Reviewing</SelectItem>
+                <SelectItem value="Interviewing">Interviewing</SelectItem>
+                <SelectItem value="Hired">Hired</SelectItem>
+                <SelectItem value="Rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -281,7 +232,7 @@ export default function MyApplications() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            {application.job?.title}
+                            {application.job?.title || 'Unknown Job'}
                           </h3>
                           {application.job?.company?.website && (
                             <Button variant="ghost" size="sm" className="h-6 w-6 p-0" asChild>
@@ -294,17 +245,17 @@ export default function MyApplications() {
                         
                         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <Building className="h-4 w-4" />
-                          <span className="font-medium">{application.job?.company?.name}</span>
+                          <span className="font-medium">{application.job?.company?.name || 'Unknown Company'}</span>
                           <span>•</span>
                           <MapPin className="h-4 w-4" />
-                          <span>{application.job?.location}</span>
+                          <span>{application.job?.location || 'Unknown Location'}</span>
                           <span>•</span>
-                          <span className="capitalize">{application.job?.type}</span>
+                          <span className="capitalize">{application.job?.f_type || 'Unknown Type'}</span>
                         </div>
                         
-                        {application.coverLetter && (
+                        {application.cover_letter && (
                           <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                            {application.coverLetter}
+                            {application.cover_letter}
                           </p>
                         )}
                       </div>
@@ -313,16 +264,16 @@ export default function MyApplications() {
 
                   {/* Right Section - Status & Date */}
                   <div className="flex flex-col lg:items-end gap-3">
-                    <StatusBadge status={application.status} />
+                    <StatusBadge status={application.status || 'Applied'} />
                     
                     <div className="text-right">
                       <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <Calendar className="h-3 w-3" />
-                        <span>Applied {format(new Date(application.createdAt), 'MMM d, yyyy')}</span>
+                        <span>Applied {format(new Date(application.created_at), 'MMM d, yyyy')}</span>
                       </div>
-                      {application.updatedAt !== application.createdAt && (
+                      {application.updated_at !== application.created_at && (
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Updated {format(new Date(application.updatedAt), 'MMM d, yyyy')}
+                          Updated {format(new Date(application.updated_at), 'MMM d, yyyy')}
                         </div>
                       )}
                     </div>
