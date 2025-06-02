@@ -24,7 +24,7 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 
 export default function Settings() {
   const { session } = useAuth();
@@ -94,7 +94,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="mx-auto max-w-4xl py-8 px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

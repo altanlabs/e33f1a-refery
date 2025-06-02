@@ -22,7 +22,7 @@ import {
   AlertCircle,
   Camera
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { format } from 'date-fns';
 
 export default function Profile() {
@@ -112,7 +112,7 @@ export default function Profile() {
   const userCreatedAt = session?.user?.created_at || new Date().toISOString();
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="mx-auto max-w-4xl py-8 px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

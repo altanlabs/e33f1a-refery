@@ -12,7 +12,7 @@ import {
   AlertCircle,
   Save
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { dbHelpers } from '@/lib/supabase';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -136,7 +136,7 @@ export default function EditJob() {
 
   if (!session?.user || userRole !== 'poster') {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-8">
+      <div>
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -154,7 +154,7 @@ export default function EditJob() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-8">
+      <div>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading job details...</span>
@@ -182,7 +182,7 @@ export default function EditJob() {
   }
 
   return (
-    <div className="mx-auto py-8 px-4 max-w-2xl">
+    <div>
       {/* Header */}
       <div className="mb-8">
         <Button variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mb-4">

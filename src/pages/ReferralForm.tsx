@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileUpload } from '@/components/ui/FileUpload';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { dbHelpers } from '@/lib/supabase';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -101,7 +100,7 @@ export default function ReferralForm() {
 
   if (!session?.user) {
     return (
-      <div className="container mx-auto py-6">
+      <div className="mx-auto max-w-7xl py-6 px-4">
         <Alert>
           <AlertDescription>
             Please log in to make a referral.
@@ -113,7 +112,7 @@ export default function ReferralForm() {
 
   if (!job) {
     return (
-      <div className="container mx-auto py-6 flex items-center justify-center">
+      <div className="mx-auto max-w-7xl py-6 px-4 flex items-center justify-center">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading job details...</span>
@@ -123,7 +122,7 @@ export default function ReferralForm() {
   }
 
   return (
-    <div className="container mx-auto py-6 max-w-2xl">
+    <div className="mx-auto max-w-2xl py-6 px-4">
       {/* Header */}
       <div className="mb-6">
         <Button
