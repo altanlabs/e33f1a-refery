@@ -40,6 +40,10 @@ const routes = [
         element: <Index />,
       },
       {
+        path: "auth",
+        element: <Auth />,
+      },
+      {
         path: "dashboard",
         element: (
           <ProtectedRoute>
@@ -156,10 +160,6 @@ const routes = [
         element: <NotFound />,
       },
     ],
-  },
-  {
-    path: "/auth",
-    element: <Auth />,
   },
 ];
 
