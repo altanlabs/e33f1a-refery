@@ -24,7 +24,7 @@ import {
   XCircle,
   Loader2
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
@@ -43,6 +43,7 @@ const rewardStatusConfig = {
 };
 
 export default function MyReferrals() {
+  const { user } = useAuth();
   const [referrals, setReferrals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
