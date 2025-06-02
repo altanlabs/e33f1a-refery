@@ -13,6 +13,8 @@ import MyReferrals from "./pages/MyReferrals";
 import MyApplications from "./pages/MyApplications";
 import Payouts from "./pages/Payouts";
 import Apply from "./pages/Apply";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component
@@ -108,6 +110,22 @@ const routes = [
         element: (
           <ProtectedRoute>
             <Payouts />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         ),
       },
