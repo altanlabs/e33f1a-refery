@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JobCard } from '@/components/jobs/JobCard';
 import { JobFilters, JobFiltersState } from '@/components/jobs/JobFilters';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { dbHelpers } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -115,7 +115,7 @@ export default function JobBoard() {
 
   if (!session?.user) {
     return (
-      <div className="container mx-auto py-6">
+      <div className="mx-auto max-w-7xl py-6 px-4">
         <Alert>
           <AlertDescription>
             Please log in to view jobs.
@@ -129,7 +129,7 @@ export default function JobBoard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-6 flex items-center justify-center">
+      <div className="mx-auto max-w-7xl py-6 px-4 flex items-center justify-center">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading jobs...</span>
@@ -139,7 +139,7 @@ export default function JobBoard() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="mx-auto max-w-7xl py-6 px-4 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
           {userRole === 'referrer' ? 'Job Board' : 'Job Opportunities'}

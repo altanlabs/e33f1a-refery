@@ -26,7 +26,7 @@ import {
   Calendar,
   ExternalLink
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format, formatDistanceToNow } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
@@ -185,7 +185,7 @@ export default function JobsManagement() {
   if (!session?.user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="container mx-auto py-16 px-4 max-w-2xl">
+        <div className="mx-auto max-w-2xl py-16 px-4">
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm dark:bg-slate-800/80">
             <CardContent className="p-12 text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -207,7 +207,7 @@ export default function JobsManagement() {
   if (jobs.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="container mx-auto py-16 px-4 max-w-2xl">
+        <div className="mx-auto max-w-2xl py-16 px-4">
           <div className="flex flex-col items-center justify-center">
             <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6">
               <Loader2 className="h-8 w-8 text-white animate-spin" />
@@ -228,7 +228,7 @@ export default function JobsManagement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="mx-auto max-w-7xl py-8 px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">

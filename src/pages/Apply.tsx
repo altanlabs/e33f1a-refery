@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { dbHelpers } from '@/lib/supabase';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { format } from 'date-fns';
 
 export default function Apply() {
@@ -117,7 +117,7 @@ export default function Apply() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading job details...</span>
@@ -148,7 +148,7 @@ export default function Apply() {
 
   if (submitted) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div>
         <Card>
           <CardContent className="p-12 text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-6" />
@@ -178,7 +178,7 @@ export default function Apply() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div>
       {/* Header */}
       <div className="mb-8">
         <Button variant="ghost" asChild className="mb-4">
