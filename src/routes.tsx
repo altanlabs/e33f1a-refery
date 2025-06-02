@@ -8,6 +8,7 @@ import JobBoard from "./pages/JobBoard";
 import JobsManagement from "./pages/JobsManagement";
 import Companies from "./pages/Companies";
 import NewJob from "./pages/NewJob";
+import EditJob from "./pages/EditJob";
 import ReferralForm from "./pages/ReferralForm";
 import MyReferrals from "./pages/MyReferrals";
 import MyApplications from "./pages/MyApplications";
@@ -63,6 +64,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <JobDetails />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "jobs/:jobId/edit",
+        element: (
+          <ProtectedRoute>
+            <EditJob />
           </ProtectedRoute>
         ),
       },

@@ -38,10 +38,14 @@ export default function JobDetails() {
   const [referrals, setReferrals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [savedJobs, setSavedJobs] = useState<any[]>([]);
 
   useEffect(() => {
     if (jobId) {
       loadJobDetails();
+      loadSavedJobs();
     }
   }, [jobId]);
 
@@ -75,6 +79,15 @@ export default function JobDetails() {
     }
   };
 
+  const loadSavedJobs = async () => {
+    try {
+      const savedJobsData = await dbHelpers.getSavedJobs();
+      setSavedJobs(savedJobsData || []);
+    } catch (err) {
+      console.error('Error loading saved jobs:', err);
+    }
+  };
+
   const handleEdit = () => {
     navigate(`/jobs/${jobId}/edit`);
   };
@@ -84,6 +97,61 @@ export default function JobDetails() {
       // Handle job deletion
       console.log('Delete job:', jobId);
       navigate('/jobs');
+    }
+  };
+
+  const handleSaveJob = async () => {
+    try {
+      // Toggle saved state
+      setSaved(!saved);
+      
+      // Here you would typically save to a user's saved jobs list
+      // For now, we'll just show a temporary notification
+      if (!saved) {
+        // Show success message
+        console.log('Job saved successfully');
+      } else {
+        console.log('Job removed from saved');
+      }
+    } catch (err) {
+      console.error('Error saving job:', err);
+    }
+  };
+
+  const handleShareJob = async () => {
+    try {
+      setSharing(true);
+      
+      const shareData = {
+        title: `${job.title} at ${job.company?.name}`,
+        text: `Check out this job opportunity: ${job.title} at ${job.company?.name}. Referral reward: $${job.reward_amount?.toLocaleString()}`,
+        url: window.location.href
+      };
+
+      // Check if Web Share API is supported
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(
+          `${shareData.title}\n${shareData.text}\n${shareData.url}`
+        );
+        alert('Job details copied to clipboard!');
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name !== 'AbortError') {
+        console.error('Error sharing job:', err);
+        // Fallback: Copy to clipboard
+        try {
+          const shareText = `${job.title} at ${job.company?.name}\n${window.location.href}`;
+          await navigator.clipboard.writeText(shareText);
+          alert('Job link copied to clipboard!');
+        } catch (clipboardErr) {
+          console.error('Error copying to clipboard:', clipboardErr);
+        }
+      }
+    } finally {
+      setSharing(false);
     }
   };
 
@@ -311,7 +379,8 @@ export default function JobDetails() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
                 <Badge variant="outline" className="capitalize">
-                  {job.status}
+                  {getStatusIcon(job.status)}
+                  <span className="ml-1">{job.status}</span>
                 </Badge>
               </div>
             </CardContent>
@@ -339,14 +408,23 @@ export default function JobDetails() {
                 </Button>
               )}
               
-              <Button variant="outline" className="w-full">
-                <Bookmark className="h-4 w-4 mr-2" />
-                Save Job
+              <Button variant="outline" className="w-full" onClick={handleSaveJob}>
+                <Bookmark className={`h-4 w-4 mr-2 ${saved ? 'fill-current' : ''}`} />
+                {saved ? 'Saved' : 'Save Job'}
               </Button>
               
-              <Button variant="outline" className="w-full">
-                <Share2 className="h-4 w-4 mr-2" />
-                Share Job
+              <Button variant="outline" className="w-full" onClick={handleShareJob} disabled={sharing}>
+                {sharing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share Job
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>

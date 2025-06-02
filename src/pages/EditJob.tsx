@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,11 +15,13 @@ import {
 import { useAppStore } from '@/store';
 import { dbHelpers } from '@/lib/supabase';
 
-export default function NewJob() {
+export default function EditJob() {
+  const { jobId } = useParams();
   const navigate = useNavigate();
   const { auth } = useAppStore();
+  const [job, setJob] = useState<any>(null);
   const [companies, setCompanies] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>('');
   
@@ -29,23 +31,50 @@ export default function NewJob() {
     description: '',
     location: '',
     f_type: '',
+    status: '',
     reward_amount: '',
     requirements: '',
     closing_date: ''
   });
 
   useEffect(() => {
-    loadCompanies();
-  }, []);
+    if (jobId) {
+      loadJobAndCompanies();
+    }
+  }, [jobId]);
 
-  const loadCompanies = async () => {
+  const loadJobAndCompanies = async () => {
     try {
       setLoading(true);
-      const data = await dbHelpers.getCompanies();
-      setCompanies(data || []);
+      
+      const [jobsData, companiesData] = await Promise.all([
+        dbHelpers.getJobs(),
+        dbHelpers.getCompanies()
+      ]);
+      
+      const foundJob = jobsData?.find(j => j.id === jobId);
+      
+      if (foundJob) {
+        setJob(foundJob);
+        setFormData({
+          title: foundJob.title || '',
+          company: foundJob.company?.id || '',
+          description: foundJob.description || '',
+          location: foundJob.location || '',
+          f_type: foundJob.f_type || '',
+          status: foundJob.status || 'Open',
+          reward_amount: foundJob.reward_amount?.toString() || '',
+          requirements: foundJob.requirements || '',
+          closing_date: foundJob.closing_date ? foundJob.closing_date.split('T')[0] : ''
+        });
+      } else {
+        setError('Job not found');
+      }
+      
+      setCompanies(companiesData || []);
     } catch (err) {
-      console.error('Error loading companies:', err);
-      setError('Failed to load companies. Please try again.');
+      console.error('Error loading job:', err);
+      setError('Failed to load job details');
     } finally {
       setLoading(false);
     }
@@ -67,7 +96,7 @@ export default function NewJob() {
     }
 
     if (!auth.user) {
-      setError('You must be logged in to create a job');
+      setError('You must be logged in to edit a job');
       return;
     }
 
@@ -75,7 +104,7 @@ export default function NewJob() {
       setSaving(true);
       setError('');
 
-      // Create job using database helper
+      // Update job using database helper
       // Note: This would need to be implemented in dbHelpers
       const jobData = {
         title: formData.title,
@@ -83,21 +112,21 @@ export default function NewJob() {
         description: formData.description,
         location: formData.location,
         f_type: formData.f_type,
-        status: 'Open',
+        status: formData.status,
         reward_amount: formData.reward_amount ? parseInt(formData.reward_amount) : 0,
         requirements: formData.requirements,
         closing_date: formData.closing_date || null
       };
 
-      console.log('Creating job:', jobData);
-      // TODO: Implement dbHelpers.createJob()
+      console.log('Updating job:', jobData);
+      // TODO: Implement dbHelpers.updateJob()
       
-      navigate('/jobs', {
-        state: { message: 'Job posted successfully!' }
+      navigate(`/jobs/${jobId}`, {
+        state: { message: 'Job updated successfully!' }
       });
     } catch (err: any) {
-      console.error('Error creating job:', err);
-      setError(err.message || 'Failed to create job. Please try again.');
+      console.error('Error updating job:', err);
+      setError(err.message || 'Failed to update job. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -113,8 +142,37 @@ export default function NewJob() {
               Access Denied
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              You must be logged in as a poster to create jobs.
+              You must be logged in as a poster to edit jobs.
             </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-2xl">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading job details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !job) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-2xl">
+        <Card>
+          <CardContent className="p-12 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              {error}
+            </h3>
+            <Button onClick={() => navigate('/jobs')}>
+              Back to Jobs
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -125,15 +183,15 @@ export default function NewJob() {
     <div className="container mx-auto py-8 px-4 max-w-2xl">
       {/* Header */}
       <div className="mb-8">
-        <Button variant="ghost" onClick={() => navigate('/jobs')} className="mb-4">
+        <Button variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Jobs
+          Back to Job Details
         </Button>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Post a New Job
+          Edit Job
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Create a job posting to find candidates through referrals
+          Update your job posting details
         </p>
       </div>
 
@@ -179,11 +237,6 @@ export default function NewJob() {
                     ))}
                   </SelectContent>
                 </Select>
-                {companies.length === 0 && !loading && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    No companies found. Please add a company first.
-                  </p>
-                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,7 +267,21 @@ export default function NewJob() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Open">Open</SelectItem>
+                      <SelectItem value="Closed">Closed</SelectItem>
+                      <SelectItem value="On Hold">On Hold</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div>
                   <Label htmlFor="reward_amount">Referral Reward ($)</Label>
                   <Input
@@ -272,20 +339,20 @@ export default function NewJob() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate('/jobs')}
+                onClick={() => navigate(`/jobs/${jobId}`)}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving || loading}>
+              <Button type="submit" disabled={saving}>
                 {saving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Posting...
+                    Updating...
                   </>
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Post Job
+                    Update Job
                   </>
                 )}
               </Button>
