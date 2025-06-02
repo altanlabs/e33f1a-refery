@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, AuthWrapper } from '@/lib/auth';
+import { useAuth, AuthWrapper } from 'altan-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -47,7 +47,6 @@ export default function Auth() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
           <AuthWrapper
             defaultTab="signin"
             onSignInSuccess={handleSignInSuccess}
@@ -55,7 +54,6 @@ export default function Auth() {
             onError={handleError}
             showSocialAuth={true}
           />
-          
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm font-medium mb-2">Demo Mode:</p>
             <p className="text-xs text-muted-foreground">

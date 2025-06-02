@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { dbHelpers } from '@/lib/supabase';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from 'altan-auth';
 import { format } from 'date-fns';
 
 export default function Apply() {
@@ -104,7 +104,7 @@ export default function Apply() {
         job: jobId!,
         cover_letter: formData.coverLetter,
         status: 'Applied'
-      });
+      }));
 
       setSubmitted(true);
     } catch (err) {

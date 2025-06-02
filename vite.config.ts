@@ -14,12 +14,4 @@ export default defineConfig({
     port: 3000,
     host: true,
   },
-  optimizeDeps: {
-    exclude: ['altan-auth'], // Exclude altan-auth from optimization
-  },
-  build: {
-    rollupOptions: {
-      external: ['altan-auth'], // Exclude altan-auth from build
-    },
-  },
 })

@@ -26,7 +26,7 @@ import {
   Calendar,
   ExternalLink
 } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format, formatDistanceToNow } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
@@ -335,7 +335,7 @@ export default function JobsManagement() {
         <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm dark:bg-slate-800/80">
           <CardContent className="p-6">
             <div className="flex items-center mb-4">
-              <Filter className="h-5 w-5 text-gray-500 mr-2" />
+              <Filter className="h-5 w-5 text-gray-500" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filters & Search</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
