@@ -210,9 +210,7 @@ export function ChatInterface() {
             {/* Messages */}
             <div className="chat-messages flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
-                <div key={message.id} className="message-container">
-                  <ChatMessage message={message} />
-                </div>
+                <ChatMessage key={message.id} message={message} />
               ))}
               
               {isTyping && <TypingIndicator />}

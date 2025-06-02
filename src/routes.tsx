@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { useAuth } from 'altan-auth';
 import { Layout } from "./components/layout/Layout";
-import { LoginForm } from "./components/auth/LoginForm";
-import { SignupForm } from "./components/auth/SignupForm";
+import Auth from "./pages/Auth";
 import Index from "./pages/index";
 import Dashboard from "./pages/Dashboard";
 import JobBoard from "./pages/JobBoard";
@@ -19,10 +19,14 @@ import Settings from "./pages/Settings";
 import JobDetails from "./pages/JobDetails";
 import NotFound from "./pages/NotFound";
 
-// Auth guard component
+// Auth guard component using altan-auth
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  // This would normally check authentication state
-  // For now, we'll allow access to demonstrate the app
+  const { session } = useAuth();
+  
+  if (!session?.user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
   return <>{children}</>;
 };
 
@@ -155,20 +159,7 @@ const routes = [
   },
   {
     path: "/auth",
-    children: [
-      {
-        path: "login",
-        element: <LoginForm />,
-      },
-      {
-        path: "signup",
-        element: <SignupForm />,
-      },
-      {
-        index: true,
-        element: <Navigate to="/auth/login" replace />,
-      },
-    ],
+    element: <Auth />,
   },
 ];
 

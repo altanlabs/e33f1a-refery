@@ -10,27 +10,29 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { Menu, LogOut, User, Settings, Briefcase, Users, DollarSign } from 'lucide-react';
 
 export function Navbar() {
-  const { auth, logout } = useAppStore();
+  const { session, signOut } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/auth/login');
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
   };
 
   const getNavItems = () => {
-    if (!auth.user) return [];
+    if (!session?.user) return [];
+
+    const userRole = session.user.user_metadata?.role || 'referrer';
 
     const baseItems = [
       { href: '/dashboard', label: 'Dashboard', icon: Briefcase },
     ];
 
-    switch (auth.user.role) {
+    switch (userRole) {
       case 'poster':
         return [
           ...baseItems,
@@ -127,17 +129,18 @@ export function Navbar() {
             </Link>
           </div>
           <nav className="flex items-center">
-            {auth.isAuthenticated && auth.user ? (
+            {session?.user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                      <AvatarImage src={session.user.user_metadata?.avatar_url} alt={session.user.user_metadata?.full_name || session.user.email} />
                       <AvatarFallback>
-                        {auth.user.name
+                        {(session.user.user_metadata?.full_name || session.user.email || 'U')
                           .split(' ')
                           .map((n) => n[0])
-                          .join('')}
+                          .join('')
+                          .toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -145,12 +148,12 @@ export function Navbar() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{auth.user.name}</p>
+                      <p className="font-medium">{session.user.user_metadata?.full_name || 'User'}</p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {auth.user.email}
+                        {session.user.email}
                       </p>
                       <p className="text-xs text-muted-foreground capitalize">
-                        {auth.user.role}
+                        {session.user.user_metadata?.role || 'referrer'}
                       </p>
                     </div>
                   </div>

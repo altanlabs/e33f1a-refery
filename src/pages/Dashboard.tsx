@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAppStore } from '@/store';
-import { jobApi, referralApi, applicationApi, companyApi } from '@/lib/api';
+import { useAuth } from 'altan-auth';
+import { dbHelpers } from '@/lib/supabase';
 import { 
   Briefcase, 
   Users, 
@@ -20,35 +20,36 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Dashboard() {
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [stats, setStats] = useState<any>({});
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (auth.user) {
+    if (session?.user) {
       loadDashboardData();
     }
-  }, [auth.user]);
+  }, [session?.user]);
 
   const loadDashboardData = async () => {
-    if (!auth.user) return;
+    if (!session?.user) return;
 
     try {
       setLoading(true);
       setError('');
 
-      const userRole = auth.user.role;
+      // Get user role from metadata or default to referrer
+      const userRole = session.user.user_metadata?.role || 'referrer';
       let calculatedStats = {};
       let activity: any[] = [];
 
       switch (userRole) {
         case 'poster':
           const [jobs, referrals, applications] = await Promise.all([
-            jobApi.getAll(),
-            referralApi.getAll(),
-            applicationApi.getAll()
+            dbHelpers.getJobs(),
+            dbHelpers.getReferrals(),
+            dbHelpers.getApplications()
           ]);
 
           const userJobs = jobs; 
@@ -66,7 +67,7 @@ export default function Dashboard() {
             .slice(0, 5)
             .map(referral => ({
               type: 'referral',
-              title: `New referral for ${referral.job_data?.title || 'Unknown Job'}`,
+              title: `New referral for ${referral.job?.title || 'Unknown Job'}`,
               description: `${referral.candidate_name} - ${referral.status}`,
               time: referral.created_at,
               status: referral.status,
@@ -74,11 +75,11 @@ export default function Dashboard() {
           break;
 
         case 'referrer':
-          const userReferrals = await referralApi.getAll();
+          const userReferrals = await dbHelpers.getReferrals();
           const totalEarnings = userReferrals
             .filter(r => r.reward_status === 'Released')
             .reduce((sum, r) => {
-              return sum + (r.job_data?.reward_amount || 0);
+              return sum + (r.job?.reward_amount || 0);
             }, 0);
           
           calculatedStats = {
@@ -93,14 +94,14 @@ export default function Dashboard() {
             .map(referral => ({
               type: 'status_update',
               title: `Referral status updated`,
-              description: `${referral.candidate_name} for ${referral.job_data?.title || 'Unknown Job'} - ${referral.status}`,
+              description: `${referral.candidate_name} for ${referral.job?.title || 'Unknown Job'} - ${referral.status}`,
               time: referral.updated_at,
               status: referral.status,
             }));
           break;
 
         case 'candidate':
-          const userApplications = await applicationApi.getAll();
+          const userApplications = await dbHelpers.getApplications();
           
           calculatedStats = {
             totalApplications: userApplications.length,
@@ -114,7 +115,7 @@ export default function Dashboard() {
             .map(application => ({
               type: 'application',
               title: `Application status updated`,
-              description: `${application.job_data?.title || 'Unknown Job'} - ${application.status}`,
+              description: `${application.job?.title || 'Unknown Job'} - ${application.status}`,
               time: application.updated_at,
               status: application.status,
             }));
@@ -131,7 +132,7 @@ export default function Dashboard() {
     }
   };
 
-  if (!auth.user) {
+  if (!session?.user) {
     return (
       <div className="container mx-auto py-6">
         <Alert>
@@ -154,8 +155,11 @@ export default function Dashboard() {
     );
   }
 
+  const userRole = session.user.user_metadata?.role || 'referrer';
+  const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
+
   const getStatsCards = () => {
-    switch (auth.user.role) {
+    switch (userRole) {
       case 'poster':
         return [
           {
@@ -258,7 +262,7 @@ export default function Dashboard() {
   };
 
   const getQuickActions = () => {
-    switch (auth.user.role) {
+    switch (userRole) {
       case 'poster':
         return [
           { label: 'Post New Job', href: '/jobs/new', icon: Plus },
@@ -293,14 +297,14 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            Welcome back, {auth.user.name.split(' ')[0]}!
+            Welcome back, {userName.split(' ')[0]}!
           </h1>
           <p className="text-muted-foreground">
-            Here's what's happening with your {auth.user.role === 'poster' ? 'hiring' : auth.user.role === 'referrer' ? 'referrals' : 'job search'}.
+            Here's what's happening with your {userRole === 'poster' ? 'hiring' : userRole === 'referrer' ? 'referrals' : 'job search'}.
           </p>
         </div>
         <Badge variant="outline" className="capitalize">
-          {auth.user.role}
+          {userRole}
         </Badge>
       </div>
 
