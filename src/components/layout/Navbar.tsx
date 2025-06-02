@@ -180,10 +180,10 @@ export function Navbar() {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" asChild>
-                  <Link to="/auth/login">Login</Link>
+                  <Link to="/auth">Login</Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/auth/signup">Sign Up</Link>
+                  <Link to="/auth">Sign Up</Link>
                 </Button>
               </div>
             )}

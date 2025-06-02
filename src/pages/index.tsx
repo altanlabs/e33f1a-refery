@@ -161,14 +161,14 @@ export default function App() {
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Button size="lg" className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-2xl shadow-purple-500/25 transform hover:scale-105 transition-all duration-300" asChild>
-              <Link to="/auth/signup">
+              <Link to="/auth">
                 <Rocket className="mr-2 h-5 w-5" />
                 Start Your Journey
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-4 text-lg font-semibold bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 hover:bg-white/80 dark:hover:bg-gray-800/80 transform hover:scale-105 transition-all duration-300" asChild>
-              <Link to="/auth/login">
+              <Link to="/auth">
                 <Globe className="mr-2 h-5 w-5" />
                 Explore Platform
               </Link>
@@ -301,7 +301,7 @@ export default function App() {
                     </ul>
                     
                     <Button className={`w-full py-3 text-lg font-semibold bg-gradient-to-r ${type.gradient} hover:shadow-xl transform hover:scale-105 transition-all duration-300`} asChild>
-                      <Link to="/auth/signup">
+                      <Link to="/auth">
                         {type.cta}
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
@@ -387,7 +387,7 @@ export default function App() {
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="px-10 py-4 text-xl font-bold bg-white text-purple-600 hover:bg-gray-100 shadow-2xl transform hover:scale-110 transition-all duration-300" asChild>
-              <Link to="/auth/signup">
+              <Link to="/auth">
                 <Rocket className="mr-3 h-6 w-6" />
                 Start Your Success Story
                 <ArrowRight className="ml-3 h-6 w-6" />
