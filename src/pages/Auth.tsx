@@ -26,7 +26,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center px-4">
+    <div className="flex h-screen w-full flex-col items-center justify-center px-4">
       <Card className="w-full max-w-lg">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
@@ -46,13 +46,6 @@ export default function Auth() {
             onError={handleError}
             showSocialAuth={true}
           />
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2">Demo Mode:</p>
-            <p className="text-xs text-muted-foreground">
-              Create a new account or sign in to test the app.
-              The database is live and functional!
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
