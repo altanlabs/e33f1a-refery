@@ -3,12 +3,9 @@ import { Button } from '@/components/ui/button';
 
 export function AuthButtons() {
   return (
-    <div className="flex items-center space-x-2">
-      <Button variant="ghost" asChild>
-        <Link to="/auth">Login</Link>
-      </Button>
+    <div className="flex items-center">
       <Button asChild>
-        <Link to="/auth">Sign Up</Link>
+        <Link to="/auth">Access</Link>
       </Button>
     </div>
   );

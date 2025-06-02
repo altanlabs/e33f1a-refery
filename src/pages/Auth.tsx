@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/auth';
-import AuthWrapper from '@/components/auth/AuthWrapper';
+import { useAuth, AuthWrapper } from 'altan-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Auth() {
@@ -27,7 +26,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl flex h-screen w-screen flex-col items-center justify-center px-4">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center px-4">
       <Card className="w-full max-w-lg">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">

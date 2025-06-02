@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/auth';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from 'altan-auth';
 import { Logo } from './navbar/Logo';
 import { NavLinks } from './navbar/NavLinks';
 import { MobileMenu } from './navbar/MobileMenu';
@@ -10,14 +10,20 @@ import { useNavigation } from '@/hooks/useNavigation';
 
 export function Navbar() {
   const navigate = useNavigate();
-  const { session, signOut } = useAuth();
+  const location = useLocation();
+  const { session, service } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavigation(session?.user || null);
 
   const handleLogout = async () => {
-    await signOut();
+    await service.signOut();
     navigate('/');
   };
+
+  // Hide navbar on auth page
+  if (location.pathname === '/auth') {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
