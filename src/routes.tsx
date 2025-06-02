@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { useAuth } from 'altan-auth';
+import { useAuth } from './lib/auth';
 import { Layout } from "./components/layout/Layout";
 import Auth from "./pages/Auth";
 import Index from "./pages/index";
@@ -19,7 +19,7 @@ import Settings from "./pages/Settings";
 import JobDetails from "./pages/JobDetails";
 import NotFound from "./pages/NotFound";
 
-// Auth guard component using altan-auth
+// Auth guard component using custom auth
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session } = useAuth();
   

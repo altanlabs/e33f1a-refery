@@ -1,15 +1,15 @@
 import { RouterProvider } from "react-router-dom";
-import { AuthProviderWrapper } from './components/auth/AuthProviderWrapper';
+import { AuthProvider } from './lib/auth';
 import "./index.css";
 import { router } from "./routes";
 
 const App = () => {
   return (
-    <AuthProviderWrapper>
+    <AuthProvider>
       <div className="min-h-screen">
         <RouterProvider router={router} />
       </div>
-    </AuthProviderWrapper>
+    </AuthProvider>
   );
 };
 
