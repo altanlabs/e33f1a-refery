@@ -41,10 +41,10 @@ export default function JobsManagement() {
   
   const [filters, setFilters] = useState({
     search: '',
-    location: '',
-    type: '',
-    company: '',
-    status: '',
+    location: 'all',
+    type: 'all',
+    company: 'all',
+    status: 'all',
     sortBy: 'newest'
   });
 
@@ -87,22 +87,22 @@ export default function JobsManagement() {
       }
 
       // Location filter
-      if (filters.location && !job.location?.toLowerCase().includes(filters.location.toLowerCase())) {
+      if (filters.location && filters.location !== 'all' && !job.location?.toLowerCase().includes(filters.location.toLowerCase())) {
         return false;
       }
 
       // Type filter
-      if (filters.type && job.f_type !== filters.type) {
+      if (filters.type && filters.type !== 'all' && job.f_type !== filters.type) {
         return false;
       }
 
       // Status filter
-      if (filters.status && job.status !== filters.status) {
+      if (filters.status && filters.status !== 'all' && job.status !== filters.status) {
         return false;
       }
 
       // Company filter
-      if (filters.company && job.company?.id !== filters.company) {
+      if (filters.company && filters.company !== 'all' && job.company?.id !== filters.company) {
         return false;
       }
 
@@ -240,24 +240,24 @@ export default function JobsManagement() {
               </div>
             </div>
             
-            <Select value={filters.location} onValueChange={(value) => setFilters(prev => ({ ...prev, location: value }))}>
+            <Select value={filters.location} onValueChange={(value) => setFilters(prev => ({ ...prev, location: value === 'all' ? '' : value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Location" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Locations</SelectItem>
+                <SelectItem value="all">All Locations</SelectItem>
                 <SelectItem value="san francisco">San Francisco</SelectItem>
                 <SelectItem value="new york">New York</SelectItem>
                 <SelectItem value="remote">Remote</SelectItem>
               </SelectContent>
             </Select>
             
-            <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}>
+            <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value === 'all' ? '' : value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Job Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="Full-time">Full-time</SelectItem>
                 <SelectItem value="Part-time">Part-time</SelectItem>
                 <SelectItem value="Contract">Contract</SelectItem>
@@ -265,12 +265,12 @@ export default function JobsManagement() {
               </SelectContent>
             </Select>
             
-            <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
+            <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value === 'all' ? '' : value }))}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="Open">Active</SelectItem>
                 <SelectItem value="Closed">Closed</SelectItem>
                 <SelectItem value="On Hold">Paused</SelectItem>

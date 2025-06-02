@@ -36,18 +36,18 @@ export function JobFilters({ filters, onFiltersChange, userRole, companies = [] 
     onFiltersChange({
       search: '',
       location: '',
-      type: '',
+      type: 'all',
       rewardMin: '',
       rewardMax: '',
-      company: '',
-      status: '',
+      company: 'all',
+      status: 'all',
       sortBy: 'newest',
     });
   };
 
   const getActiveFiltersCount = () => {
     return Object.entries(filters).filter(([key, value]) => 
-      key !== 'sortBy' && value !== ''
+      key !== 'sortBy' && value !== '' && value !== 'all'
     ).length;
   };
 

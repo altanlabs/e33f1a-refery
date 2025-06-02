@@ -18,11 +18,11 @@ export default function JobBoard() {
   const [filters, setFilters] = useState<JobFiltersState>({
     search: '',
     location: '',
-    type: '',
+    type: 'all',
     rewardMin: '',
     rewardMax: '',
-    company: '',
-    status: '',
+    company: 'all',
+    status: 'all',
     sortBy: 'newest',
   });
 
@@ -71,7 +71,7 @@ export default function JobBoard() {
         }
       }
 
-      if (filters.type && job.f_type !== filters.type) {
+      if (filters.type && filters.type !== 'all' && job.f_type !== filters.type) {
         return false;
       }
 
@@ -82,7 +82,7 @@ export default function JobBoard() {
         return false;
       }
 
-      if (filters.company && job.company !== filters.company) {
+      if (filters.company && filters.company !== 'all' && job.company !== filters.company) {
         return false;
       }
 
