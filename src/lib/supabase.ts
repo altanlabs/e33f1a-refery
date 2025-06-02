@@ -209,11 +209,11 @@ export const dbHelpers = {
     const { data, error } = await supabase
       .from('referrals')
       .insert(referral)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create referral');
+    return data[0];
   },
 
   async updateReferral(id: string, updates: Database['public']['Tables']['referrals']['Update']) {
@@ -221,11 +221,11 @@ export const dbHelpers = {
       .from('referrals')
       .update(updates)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update referral');
+    return data[0];
   },
 
   // Payouts
@@ -252,11 +252,11 @@ export const dbHelpers = {
     const { data, error } = await supabase
       .from('payouts')
       .insert(payout)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create payout');
+    return data[0];
   },
 
   async updatePayout(id: string, updates: Database['public']['Tables']['payouts']['Update']) {
@@ -264,11 +264,11 @@ export const dbHelpers = {
       .from('payouts')
       .update(updates)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update payout');
+    return data[0];
   },
 
   // Applications
@@ -292,11 +292,11 @@ export const dbHelpers = {
     const { data, error } = await supabase
       .from('applications')
       .insert(application)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create application');
+    return data[0];
   },
 
   async updateApplication(id: string, updates: Database['public']['Tables']['applications']['Update']) {
@@ -304,11 +304,11 @@ export const dbHelpers = {
       .from('applications')
       .update(updates)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update application');
+    return data[0];
   },
 
   // Jobs
@@ -332,11 +332,11 @@ export const dbHelpers = {
       .select(`
         *,
         company:companies(*)
-      `)
-      .single();
+      `);
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create job');
+    return data[0];
   },
 
   async updateJob(id: string, updates: Database['public']['Tables']['jobs']['Update']) {
@@ -347,11 +347,11 @@ export const dbHelpers = {
       .select(`
         *,
         company:companies(*)
-      `)
-      .single();
+      `);
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update job');
+    return data[0];
   },
 
   async deleteJob(id: string) {
@@ -371,11 +371,10 @@ export const dbHelpers = {
         *,
         company:companies(*)
       `)
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (error) throw error;
-    return data;
+    return data?.[0] || null;
   },
 
   // Companies

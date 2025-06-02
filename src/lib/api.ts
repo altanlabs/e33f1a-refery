@@ -22,22 +22,21 @@ export const companyApi = {
     const { data, error } = await supabase
       .from('companies')
       .select('*')
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (error) throw error;
-    return data;
+    return data?.[0] || null;
   },
 
   async create(company: Database['public']['Tables']['companies']['Insert']): Promise<Company> {
     const { data, error } = await supabase
       .from('companies')
       .insert(company)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create company');
+    return data[0];
   },
 
   async update(id: string, updates: Database['public']['Tables']['companies']['Update']): Promise<Company> {
@@ -45,11 +44,11 @@ export const companyApi = {
       .from('companies')
       .update(updates)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update company');
+    return data[0];
   },
 
   async delete(id: string): Promise<void> {
@@ -84,11 +83,10 @@ export const jobApi = {
         *,
         company_data:companies(*)
       `)
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (error) throw error;
-    return data;
+    return data?.[0] || null;
   },
 
   async getByCompany(companyId: string): Promise<Job[]> {
@@ -105,24 +103,24 @@ export const jobApi = {
   async create(job: Database['public']['Tables']['jobs']['Insert']): Promise<Job> {
     const { data, error } = await supabase
       .from('jobs')
-      .insert(job)
-      .select()
-      .single();
+      .insert([job])
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create job');
+    return data[0];
   },
 
   async update(id: string, updates: Database['public']['Tables']['jobs']['Update']): Promise<Job> {
     const { data, error } = await supabase
       .from('jobs')
-      .update(updates)
+      .update([updates])
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update job');
+    return data[0];
   },
 
   async delete(id: string): Promise<void> {
@@ -163,11 +161,10 @@ export const referralApi = {
           company_data:companies(*)
         )
       `)
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (error) throw error;
-    return data;
+    return data?.[0] || null;
   },
 
   async getByJob(jobId: string): Promise<Referral[]> {
@@ -184,24 +181,24 @@ export const referralApi = {
   async create(referral: Database['public']['Tables']['referrals']['Insert']): Promise<Referral> {
     const { data, error } = await supabase
       .from('referrals')
-      .insert(referral)
-      .select()
-      .single();
+      .insert([referral])
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create referral');
+    return data[0];
   },
 
   async update(id: string, updates: Database['public']['Tables']['referrals']['Update']): Promise<Referral> {
     const { data, error } = await supabase
       .from('referrals')
-      .update(updates)
+      .update([updates])
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update referral');
+    return data[0];
   },
 
   async delete(id: string): Promise<void> {
@@ -242,11 +239,10 @@ export const applicationApi = {
           company_data:companies(*)
         )
       `)
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (error) throw error;
-    return data;
+    return data?.[0] || null;
   },
 
   async getByJob(jobId: string): Promise<Application[]> {
@@ -263,12 +259,12 @@ export const applicationApi = {
   async create(application: Database['public']['Tables']['applications']['Insert']): Promise<Application> {
     const { data, error } = await supabase
       .from('applications')
-      .insert(application)
-      .select()
-      .single();
+      .insert([application])
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to create application');
+    return data[0];
   },
 
   async update(id: string, updates: Database['public']['Tables']['applications']['Update']): Promise<Application> {
@@ -276,11 +272,11 @@ export const applicationApi = {
       .from('applications')
       .update(updates)
       .eq('id', id)
-      .select()
-      .single();
+      .select();
     
     if (error) throw error;
-    return data;
+    if (!data || data.length === 0) throw new Error('Failed to update application');
+    return data[0];
   },
 
   async delete(id: string): Promise<void> {
