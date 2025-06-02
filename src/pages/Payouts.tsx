@@ -26,7 +26,7 @@ import {
   Plus,
   Loader2
 } from 'lucide-react';
-import { useAuth } from '@/lib/altan-auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 

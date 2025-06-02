@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileUpload } from '@/components/ui/FileUpload';
-import { useAuth } from '@/lib/altan-auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 

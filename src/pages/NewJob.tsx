@@ -12,7 +12,7 @@ import {
   AlertCircle,
   Save
 } from 'lucide-react';
-import { useAuth } from '@/lib/altan-auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import toast, { Toaster } from 'react-hot-toast';
 

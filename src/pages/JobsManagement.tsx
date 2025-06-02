@@ -26,7 +26,7 @@ import {
   Calendar,
   ExternalLink
 } from 'lucide-react';
-import { useAuth } from '@/lib/altan-auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format, formatDistanceToNow } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
