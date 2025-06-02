@@ -26,7 +26,7 @@ import {
   Calendar,
   ExternalLink
 } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format, formatDistanceToNow } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
@@ -478,7 +478,7 @@ export default function JobsManagement() {
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4 text-blue-500" />
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {formatDistanceToNow(new Date(job.created_at), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(job.created_at), { addSuffix: true }}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">

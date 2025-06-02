@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { Plus, Building, Globe, Users, Loader2 } from 'lucide-react';
 
