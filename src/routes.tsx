@@ -15,6 +15,7 @@ import Payouts from "./pages/Payouts";
 import Apply from "./pages/Apply";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import JobDetails from "./pages/JobDetails";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component
@@ -54,6 +55,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <JobsManagement />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "jobs/:jobId",
+        element: (
+          <ProtectedRoute>
+            <JobDetails />
           </ProtectedRoute>
         ),
       },
