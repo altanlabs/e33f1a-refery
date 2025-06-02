@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { dbHelpers } from '@/lib/supabase';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function EditJob() {
   const { jobId } = useParams();
@@ -47,25 +48,23 @@ export default function EditJob() {
     try {
       setLoading(true);
       
-      const [jobsData, companiesData] = await Promise.all([
-        dbHelpers.getJobs(),
+      const [jobData, companiesData] = await Promise.all([
+        dbHelpers.getJobById(jobId!),
         dbHelpers.getCompanies()
       ]);
       
-      const foundJob = jobsData?.find(j => j.id === jobId);
-      
-      if (foundJob) {
-        setJob(foundJob);
+      if (jobData) {
+        setJob(jobData);
         setFormData({
-          title: foundJob.title || '',
-          company: foundJob.company?.id || '',
-          description: foundJob.description || '',
-          location: foundJob.location || '',
-          f_type: foundJob.f_type || '',
-          status: foundJob.status || 'Open',
-          reward_amount: foundJob.reward_amount?.toString() || '',
-          requirements: foundJob.requirements || '',
-          closing_date: foundJob.closing_date ? foundJob.closing_date.split('T')[0] : ''
+          title: jobData.title || '',
+          company: jobData.company || '',
+          description: jobData.description || '',
+          location: jobData.location || '',
+          f_type: jobData.f_type || '',
+          status: jobData.status || 'Open',
+          reward_amount: jobData.reward_amount?.toString() || '',
+          requirements: jobData.requirements || '',
+          closing_date: jobData.closing_date ? jobData.closing_date.split('T')[0] : ''
         });
       } else {
         setError('Job not found');
@@ -104,26 +103,21 @@ export default function EditJob() {
       setSaving(true);
       setError('');
 
-      // Update job using database helper
-      // Note: This would need to be implemented in dbHelpers
       const jobData = {
         title: formData.title,
         company: formData.company,
         description: formData.description,
         location: formData.location,
-        f_type: formData.f_type,
-        status: formData.status,
+        f_type: formData.f_type as 'Full-time' | 'Part-time' | 'Contract' | 'Remote',
+        status: formData.status as 'Open' | 'Closed' | 'On Hold',
         reward_amount: formData.reward_amount ? parseInt(formData.reward_amount) : 0,
         requirements: formData.requirements,
-        closing_date: formData.closing_date || null
+        closing_date: formData.closing_date || undefined
       };
 
-      console.log('Updating job:', jobData);
-      // TODO: Implement dbHelpers.updateJob()
-      
-      navigate(`/jobs/${jobId}`, {
-        state: { message: 'Job updated successfully!' }
-      });
+      await dbHelpers.updateJob(jobId!, jobData);
+      toast.success('Job updated successfully!');
+      navigate(`/jobs/${jobId}`);
     } catch (err: any) {
       console.error('Error updating job:', err);
       setError(err.message || 'Failed to update job. Please try again.');
@@ -360,6 +354,30 @@ export default function EditJob() {
           </form>
         </CardContent>
       </Card>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </div>
   );
 }

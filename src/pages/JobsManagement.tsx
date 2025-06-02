@@ -29,6 +29,7 @@ import {
 import { useAppStore } from '@/store';
 import { dbHelpers } from '@/lib/supabase';
 import { format, formatDistanceToNow } from 'date-fns';
+import toast, { Toaster } from 'react-hot-toast';
 
 const statusConfig = {
   'Open': { 
@@ -55,7 +56,6 @@ export default function JobsManagement() {
   const { auth } = useAppStore();
   const [jobs, setJobs] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   
   const [filters, setFilters] = useState({
@@ -73,9 +73,6 @@ export default function JobsManagement() {
 
   const loadData = async () => {
     try {
-      setLoading(true);
-      setError('');
-      
       const [jobsData, companiesData] = await Promise.all([
         dbHelpers.getJobs(),
         dbHelpers.getCompanies()
@@ -86,8 +83,7 @@ export default function JobsManagement() {
     } catch (err) {
       console.error('Error loading data:', err);
       setError('Failed to load jobs. Please try again.');
-    } finally {
-      setLoading(false);
+      toast.error('Failed to load jobs. Please try again.');
     }
   };
 
@@ -150,11 +146,15 @@ export default function JobsManagement() {
   const handleDeleteJob = async (jobId: string) => {
     if (window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
       try {
-        // TODO: Implement job deletion
-        console.log('Delete job:', jobId);
-        await loadData(); // Refresh the list
+        await dbHelpers.deleteJob(jobId);
+        
+        // Remove job from UI state
+        setJobs(jobs.filter(job => job.id !== jobId));
+        
+        toast.success('Job deleted successfully!');
       } catch (err) {
         console.error('Error deleting job:', err);
+        toast.error('Failed to delete job. Please try again.');
       }
     }
   };
@@ -204,7 +204,7 @@ export default function JobsManagement() {
     );
   }
 
-  if (loading) {
+  if (jobs.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <div className="container mx-auto py-16 px-4 max-w-2xl">
@@ -246,7 +246,7 @@ export default function JobsManagement() {
               </p>
             </div>
             {userRole === 'poster' && (
-              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200">
+              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white border-0 shadow-lg">
                 <Link to="/jobs/new">
                   <Plus className="h-5 w-5 mr-2" />
                   Post New Job
@@ -580,6 +580,30 @@ export default function JobsManagement() {
           </Card>
         )}
       </div>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </div>
   );
 }

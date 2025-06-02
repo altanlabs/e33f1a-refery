@@ -54,8 +54,7 @@ export default function JobDetails() {
       setLoading(true);
       
       // Load job details
-      const jobs = await dbHelpers.getJobs();
-      const foundJob = jobs?.find(j => j.id === jobId);
+      const foundJob = await dbHelpers.getJobById(jobId!);
       
       if (foundJob) {
         setJob(foundJob);

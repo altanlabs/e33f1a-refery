@@ -319,8 +319,60 @@ export const dbHelpers = {
         *,
         company:companies(*)
       `)
-      .eq('status', 'Open')
       .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createJob(job: Database['public']['Tables']['jobs']['Insert']) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .insert(job)
+      .select(`
+        *,
+        company:companies(*)
+      `)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateJob(id: string, updates: Database['public']['Tables']['jobs']['Update']) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .update(updates)
+      .eq('id', id)
+      .select(`
+        *,
+        company:companies(*)
+      `)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteJob(id: string) {
+    const { error } = await supabase
+      .from('jobs')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    return true;
+  },
+
+  async getJobById(id: string) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        company:companies(*)
+      `)
+      .eq('id', id)
+      .single();
     
     if (error) throw error;
     return data;

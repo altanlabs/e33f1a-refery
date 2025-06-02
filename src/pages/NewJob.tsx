@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { dbHelpers } from '@/lib/supabase';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function NewJob() {
   const navigate = useNavigate();
@@ -75,23 +76,21 @@ export default function NewJob() {
       setSaving(true);
       setError('');
 
-      // Create job using database helper
-      // Note: This would need to be implemented in dbHelpers
       const jobData = {
         title: formData.title,
         company: formData.company,
         description: formData.description,
         location: formData.location,
-        f_type: formData.f_type,
-        status: 'Open',
+        f_type: formData.f_type as 'Full-time' | 'Part-time' | 'Contract' | 'Remote',
+        status: 'Open' as const,
         reward_amount: formData.reward_amount ? parseInt(formData.reward_amount) : 0,
         requirements: formData.requirements,
-        closing_date: formData.closing_date || null
+        closing_date: formData.closing_date || undefined
       };
 
-      console.log('Creating job:', jobData);
-      // TODO: Implement dbHelpers.createJob()
+      await dbHelpers.createJob(jobData);
       
+      toast.success('Job posted successfully!');
       navigate('/jobs', {
         state: { message: 'Job posted successfully!' }
       });
@@ -293,6 +292,30 @@ export default function NewJob() {
           </form>
         </CardContent>
       </Card>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </div>
   );
 }
