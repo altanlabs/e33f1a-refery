@@ -101,10 +101,10 @@ export default function Apply() {
         candidate_name: formData.candidateName,
         candidate_email: formData.candidateEmail,
         candidate_linkedin: formData.candidateLinkedin,
-        job: jobId!,
+        job: jobId,
         cover_letter: formData.coverLetter,
         status: 'Applied'
-      }));
+      });
 
       setSubmitted(true);
     } catch (err) {
