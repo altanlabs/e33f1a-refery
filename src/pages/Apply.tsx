@@ -117,7 +117,7 @@ export default function Apply() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="mx-auto max-w-4xl px-4 py-8">
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading job details...</span>
@@ -128,7 +128,7 @@ export default function Apply() {
 
   if (error && !job) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div>
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -148,7 +148,7 @@ export default function Apply() {
 
   if (submitted) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="mx-auto max-w-4xl px-4 py-8">
         <Card>
           <CardContent className="p-12 text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-6" />
@@ -178,7 +178,7 @@ export default function Apply() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <Button variant="ghost" asChild className="mb-4">

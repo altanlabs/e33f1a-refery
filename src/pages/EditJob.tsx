@@ -136,7 +136,7 @@ export default function EditJob() {
 
   if (!session?.user || userRole !== 'poster') {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-2xl">
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -154,7 +154,7 @@ export default function EditJob() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-2xl">
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading job details...</span>
@@ -165,7 +165,7 @@ export default function EditJob() {
 
   if (error && !job) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-2xl">
+      <div>
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -182,7 +182,7 @@ export default function EditJob() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-2xl">
+    <div className="mx-auto py-8 px-4 max-w-2xl">
       {/* Header */}
       <div className="mb-8">
         <Button variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mb-4">

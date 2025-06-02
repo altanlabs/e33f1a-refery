@@ -133,7 +133,7 @@ export default function App() {
 
       {/* Hero Section */}
       <section className="relative py-32 px-4 text-center">
-        <div className="container mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl px-4">
           <div className="mb-8 flex justify-center">
             <Badge variant="outline" className="px-6 py-2 text-sm font-medium bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-purple-200 dark:border-purple-800">
               <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
@@ -209,7 +209,7 @@ export default function App() {
 
       {/* Features Section */}
       <section className="py-32 px-4 relative">
-        <div className="container mx-auto max-w-7xl">
+        <div className="mx-auto max-w-7xl">
           <div className="text-center mb-20">
             <Badge variant="outline" className="mb-6 px-4 py-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
               <Zap className="w-4 h-4 mr-2 text-yellow-500" />
@@ -253,7 +253,7 @@ export default function App() {
       {/* User Types Section */}
       <section className="py-32 px-4 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-indigo-50/50 dark:from-gray-900/50 dark:to-indigo-950/50" />
-        <div className="container mx-auto max-w-7xl relative">
+        <div className="mx-auto max-w-7xl px-4 relative">
           <div className="text-center mb-20">
             <Badge variant="outline" className="mb-6 px-4 py-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
               <Users className="w-4 h-4 mr-2 text-blue-500" />
@@ -316,7 +316,7 @@ export default function App() {
 
       {/* Testimonials Section */}
       <section className="py-32 px-4 relative">
-        <div className="container mx-auto max-w-7xl">
+        <div className="mx-auto max-w-7xl px-4">
           <div className="text-center mb-20">
             <Badge variant="outline" className="mb-6 px-4 py-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
               <Star className="w-4 h-4 mr-2 text-yellow-500" />
@@ -333,7 +333,7 @@ export default function App() {
                 <CardContent className="p-8">
                   <div className="flex justify-center mb-6">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      <Star className="h-5 w-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
                   <blockquote className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
@@ -366,7 +366,7 @@ export default function App() {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         
-        <div className="container mx-auto max-w-5xl text-center relative">
+        <div className="mx-auto max-w-5xl text-center relative">
           <Badge variant="outline" className="mb-8 px-6 py-3 bg-white/20 backdrop-blur-sm border-white/30 text-white">
             <Sparkles className="w-5 h-5 mr-2" />
             Join the Revolution
