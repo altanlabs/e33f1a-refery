@@ -1,1 +1,41 @@
-import { Button } from '@/components/ui/button';\nimport { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';\nimport { Menu } from 'lucide-react';\nimport { Logo } from './Logo';\nimport { NavLinks, NavItem } from './NavLinks';\n\ninterface MobileMenuProps {\n  isOpen: boolean;\n  onOpenChange: (open: boolean) => void;\n  navItems: NavItem[];\n}\n\nexport function MobileMenu({ isOpen, onOpenChange, navItems }: MobileMenuProps) {\n  const handleClose = () => onOpenChange(false);\n\n  return (\n    <Sheet open={isOpen} onOpenChange={onOpenChange}>\n      <SheetTrigger asChild>\n        <Button\n          variant=\"ghost\"\n          className=\"mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden\"\n        >\n          <Menu className=\"h-5 w-5\" />\n          <span className=\"sr-only\">Toggle Menu</span>\n        </Button>\n      </SheetTrigger>\n      <SheetContent side=\"left\" className=\"pr-0\">\n        <Logo onClick={handleClose} />\n        <div className=\"my-4 h-[calc(100vh-8rem)] pb-10 pl-6\">\n          <div className=\"flex flex-col space-y-3\">\n            <NavLinks \n              items={navItems} \n              mobile \n              onItemClick={handleClose} \n            />\n          </div>\n        </div>\n      </SheetContent>\n    </Sheet>\n  );\n}"
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
+import { Logo } from './Logo';
+import { NavLinks, NavItem } from './NavLinks';
+
+interface MobileMenuProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  navItems: NavItem[];
+}
+
+export function MobileMenu({ isOpen, onOpenChange, navItems }: MobileMenuProps) {
+  const handleClose = () => onOpenChange(false);
+
+  return (
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle Menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="pr-0">
+        <Logo onClick={handleClose} />
+        <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+          <div className="flex flex-col space-y-3">
+            <NavLinks 
+              items={navItems} 
+              mobile 
+              onItemClick={handleClose} 
+            />
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

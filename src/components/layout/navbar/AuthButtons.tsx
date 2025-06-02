@@ -1,1 +1,15 @@
-import { Link } from 'react-router-dom';\nimport { Button } from '@/components/ui/button';\n\nexport function AuthButtons() {\n  return (\n    <div className=\"flex items-center space-x-2\">\n      <Button variant=\"ghost\" asChild>\n        <Link to=\"/auth\">Login</Link>\n      </Button>\n      <Button asChild>\n        <Link to=\"/auth\">Sign Up</Link>\n      </Button>\n    </div>\n  );\n}"
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+
+export function AuthButtons() {
+  return (
+    <div className="flex items-center space-x-2">
+      <Button variant="ghost" asChild>
+        <Link to="/auth">Login</Link>
+      </Button>
+      <Button asChild>
+        <Link to="/auth">Sign Up</Link>
+      </Button>
+    </div>
+  );
+}

@@ -1,1 +1,37 @@
-import { Link } from 'react-router-dom';\nimport { LucideIcon } from 'lucide-react';\n\nexport interface NavItem {\n  href: string;\n  label: string;\n  icon: LucideIcon;\n}\n\ninterface NavLinksProps {\n  items: NavItem[];\n  mobile?: boolean;\n  onItemClick?: () => void;\n}\n\nexport function NavLinks({ items, mobile = false, onItemClick = () => {} }: NavLinksProps) {\n  return (\n    <>\n      {items.map((item) => {\n        const Icon = item.icon;\n        return (\n          <Link\n            key={item.href}\n            to={item.href}\n            className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${\n              mobile ? 'py-2' : ''\n            }`}\n            onClick={onItemClick}\n          >\n            <Icon className=\"h-4 w-4\" />\n            {item.label}\n          </Link>\n        );\n      })}\n    </>\n  );\n}"
+import { Link } from 'react-router-dom';
+import { LucideIcon } from 'lucide-react';
+
+export interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+interface NavLinksProps {
+  items: NavItem[];
+  mobile?: boolean;
+  onItemClick?: () => void;
+}
+
+export function NavLinks({ items, mobile = false, onItemClick = () => {} }: NavLinksProps) {
+  return (
+    <>
+      {items.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${
+              mobile ? 'py-2' : ''
+            }`}
+            onClick={onItemClick}
+          >
+            <Icon className="h-4 w-4" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </>
+  );
+}

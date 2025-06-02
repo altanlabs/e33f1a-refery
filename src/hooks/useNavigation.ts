@@ -1,1 +1,39 @@
-import { useMemo } from 'react';\nimport { Briefcase, Users, DollarSign } from 'lucide-react';\nimport type { NavItem } from '@/components/layout/navbar/NavLinks';\nimport type { User } from '@supabase/supabase-js';\n\nexport function useNavigation(user: User | null): NavItem[] {\n  return useMemo(() => {\n    if (!user) return [];\n\n    const userRole = user.user_metadata?.role || 'referrer';\n    const baseItems: NavItem[] = [\n      { href: '/dashboard', label: 'Dashboard', icon: Briefcase },\n    ];\n\n    switch (userRole) {\n      case 'poster':\n        return [\n          ...baseItems,\n          { href: '/companies', label: 'Companies', icon: Briefcase },\n          { href: '/jobs', label: 'Jobs', icon: Briefcase },\n        ];\n      case 'referrer':\n        return [\n          ...baseItems,\n          { href: '/opportunities', label: 'Job Board', icon: Briefcase },\n          { href: '/my-referrals', label: 'My Referrals', icon: Users },\n          { href: '/payouts', label: 'Payouts', icon: DollarSign },\n        ];\n      case 'candidate':\n        return [\n          ...baseItems,\n          { href: '/opportunities', label: 'Opportunities', icon: Briefcase },\n          { href: '/my-applications', label: 'My Applications', icon: Users },\n        ];\n      default:\n        return baseItems;\n    }\n  }, [user]);\n}"
+import { useMemo } from 'react';
+import { Briefcase, Users, DollarSign } from 'lucide-react';
+import type { NavItem } from '@/components/layout/navbar/NavLinks';
+import type { User } from '@supabase/supabase-js';
+
+export function useNavigation(user: User | null): NavItem[] {
+  return useMemo(() => {
+    if (!user) return [];
+
+    const userRole = user.user_metadata?.role || 'referrer';
+    const baseItems: NavItem[] = [
+      { href: '/dashboard', label: 'Dashboard', icon: Briefcase },
+    ];
+
+    switch (userRole) {
+      case 'poster':
+        return [
+          ...baseItems,
+          { href: '/companies', label: 'Companies', icon: Briefcase },
+          { href: '/jobs', label: 'Jobs', icon: Briefcase },
+        ];
+      case 'referrer':
+        return [
+          ...baseItems,
+          { href: '/opportunities', label: 'Job Board', icon: Briefcase },
+          { href: '/my-referrals', label: 'My Referrals', icon: Users },
+          { href: '/payouts', label: 'Payouts', icon: DollarSign },
+        ];
+      case 'candidate':
+        return [
+          ...baseItems,
+          { href: '/opportunities', label: 'Opportunities', icon: Briefcase },
+          { href: '/my-applications', label: 'My Applications', icon: Users },
+        ];
+      default:
+        return baseItems;
+    }
+  }, [user]);
+}
