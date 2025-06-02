@@ -22,7 +22,7 @@ import {
   AlertCircle,
   Camera
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/altan-auth';
 import { format } from 'date-fns';
 
 export default function Profile() {

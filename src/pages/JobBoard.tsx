@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JobCard } from '@/components/jobs/JobCard';
 import { JobFilters, JobFiltersState } from '@/components/jobs/JobFilters';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';

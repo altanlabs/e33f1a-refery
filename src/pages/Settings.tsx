@@ -24,7 +24,7 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/altan-auth';
 
 export default function Settings() {
   const { session } = useAuth();

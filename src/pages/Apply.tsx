@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { dbHelpers } from '@/lib/supabase';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/altan-auth';
 import { format } from 'date-fns';
 
 export default function Apply() {

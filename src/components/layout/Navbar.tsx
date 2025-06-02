@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,46 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useStableAuth } from '@/lib/stable-auth';
 import { Menu, LogOut, User, Settings, Briefcase, Users, DollarSign } from 'lucide-react';
 
 export function Navbar() {
   const navigate = useNavigate();
+  const { session, signOut } = useStableAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [useAuth, setUseAuth] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
-  const [signOut, setSignOut] = useState<any>(null);
-
-  useEffect(() => {
-    // Dynamically import altan-auth
-    const loadAltanAuth = async () => {
-      try {
-        const altanAuth = await import('altan-auth');
-        setUseAuth(() => altanAuth.useAuth);
-      } catch (error) {
-        console.error('Failed to load altan-auth:', error);
-      }
-    };
-
-    loadAltanAuth();
-  }, []);
-
-  useEffect(() => {
-    if (useAuth) {
-      try {
-        const auth = useAuth();
-        setSession(auth.session);
-        setSignOut(() => auth.signOut);
-      } catch (error) {
-        console.error('Auth hook error:', error);
-      }
-    }
-  }, [useAuth]);
 
   const handleLogout = async () => {
-    if (signOut) {
-      await signOut();
-      navigate('/');
-    }
+    await signOut();
+    navigate('/');
   };
 
   const getNavItems = () => {

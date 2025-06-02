@@ -1,15 +1,15 @@
 import { RouterProvider } from "react-router-dom";
-import { AltanAuthWrapper } from './components/auth/AltanAuthWrapper';
+import { AuthProvider } from './lib/altan-auth';
 import "./index.css";
 import { router } from "./routes";
 
 const App = () => {
   return (
-    <AltanAuthWrapper>
+    <AuthProvider>
       <div className="min-h-screen">
         <RouterProvider router={router} />
       </div>
-    </AltanAuthWrapper>
+    </AuthProvider>
   );
 };
 

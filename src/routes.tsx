@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/altan-auth';
 import { Layout } from "./components/layout/Layout";
 import Auth from "./pages/Auth";
 import Index from "./pages/index";
@@ -19,9 +19,14 @@ import Settings from "./pages/Settings";
 import JobDetails from "./pages/JobDetails";
 import NotFound from "./pages/NotFound";
 
-// Simple auth guard that doesn't use hooks at route level
+// Auth guard component using stable custom auth
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  // We'll handle auth checking inside each component instead
+  const { session } = useAuth();
+  
+  if (!session?.user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
   return <>{children}</>;
 };
 

@@ -1,42 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth, AuthWrapper } from '@/lib/altan-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Auth() {
+  const { session } = useAuth();
   const navigate = useNavigate();
-  const [useAuth, setUseAuth] = useState<any>(null);
-  const [AuthWrapper, setAuthWrapper] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    // Dynamically import altan-auth hooks
-    const loadAltanAuth = async () => {
-      try {
-        const altanAuth = await import('altan-auth');
-        setUseAuth(() => altanAuth.useAuth);
-        setAuthWrapper(() => altanAuth.AuthWrapper);
-      } catch (error) {
-        console.error('Failed to load altan-auth:', error);
-      }
-    };
-
-    loadAltanAuth();
-  }, []);
-
-  useEffect(() => {
-    if (useAuth) {
-      try {
-        const auth = useAuth();
-        setSession(auth.session);
-        
-        if (auth.session?.user) {
-          navigate('/dashboard');
-        }
-      } catch (error) {
-        console.error('Auth hook error:', error);
-      }
+    if (session?.user) {
+      navigate('/dashboard');
     }
-  }, [useAuth, navigate]);
+  }, [session, navigate]);
 
   const handleSignInSuccess = () => {
     navigate('/dashboard');
@@ -49,19 +24,6 @@ export default function Auth() {
   const handleError = (error: any) => {
     console.error('Auth error:', error);
   };
-
-  if (!AuthWrapper) {
-    return (
-      <div className="container flex h-screen w-screen flex-col items-center justify-center">
-        <Card className="w-full max-w-lg">
-          <CardContent className="p-12 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading authentication...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
