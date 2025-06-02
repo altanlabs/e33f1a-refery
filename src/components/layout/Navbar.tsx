@@ -10,12 +10,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useStableAuth } from '@/lib/stable-auth';
+import { useAuth } from '@/lib/auth';
 import { Menu, LogOut, User, Settings, Briefcase, Users, DollarSign } from 'lucide-react';
 
 export function Navbar() {
   const navigate = useNavigate();
-  const { session, signOut } = useStableAuth();
+  const { session, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
