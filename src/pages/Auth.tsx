@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, AuthWrapper } from 'altan-auth';
+import { useAuth, AuthWrapper } from '@/lib/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Auth() {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (session?.user) {
@@ -23,6 +25,7 @@ export default function Auth() {
 
   const handleError = (error: any) => {
     console.error('Auth error:', error);
+    setError(error.message || 'An authentication error occurred');
   };
 
   return (
@@ -39,6 +42,12 @@ export default function Auth() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
           <AuthWrapper
             defaultTab="signin"
             onSignInSuccess={handleSignInSuccess}
@@ -46,6 +55,7 @@ export default function Auth() {
             onError={handleError}
             showSocialAuth={true}
           />
+          
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm font-medium mb-2">Demo Mode:</p>
             <p className="text-xs text-muted-foreground">

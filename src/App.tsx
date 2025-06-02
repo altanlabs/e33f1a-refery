@@ -1,15 +1,15 @@
 import { RouterProvider } from "react-router-dom";
-import { SafeAuthProvider } from './components/auth/SafeAuthProvider';
+import { AuthProvider } from './lib/auth';
 import "./index.css";
 import { router } from "./routes";
 
 const App = () => {
   return (
-    <SafeAuthProvider>
+    <AuthProvider>
       <div className="min-h-screen">
         <RouterProvider router={router} />
       </div>
-    </SafeAuthProvider>
+    </AuthProvider>
   );
 };
 
