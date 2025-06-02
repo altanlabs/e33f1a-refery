@@ -26,28 +26,43 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center px-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <div className="h-8 w-8 rounded bg-primary mr-2" />
-            <span className="text-2xl font-bold">Refery</span>
-          </div>
-          <CardTitle className="text-2xl text-center">Welcome to Refery</CardTitle>
-          <CardDescription className="text-center">
-            The trusted referral hiring platform
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AuthWrapper
-            defaultTab="signin"
-            onSignInSuccess={handleSignInSuccess}
-            onSignUpSuccess={handleSignUpSuccess}
-            onError={handleError}
-            showSocialAuth={true}
-          />
-        </CardContent>
-      </Card>
+    <div className="flex h-screen w-full items-center justify-center px-4">
+      {/* 
+        Wrap the Card in a div that enforces max height = screen height.
+        This way, the Card never grows taller than the viewport. 
+      */}
+      <div className="w-full max-w-lg h-full max-h-screen">
+        {/* 
+          Make the Card a flex container (flex-col). 
+          This allows us to have a header that sizes to its content, and a content area that flex‐grows.
+        */}
+        <Card className="h-full flex flex-col">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-8 w-8 rounded bg-primary mr-2" />
+              <span className="text-2xl font-bold">Refery</span>
+            </div>
+            <CardTitle className="text-2xl text-center">Welcome to Refery</CardTitle>
+            <CardDescription className="text-center">
+              The trusted referral hiring platform
+            </CardDescription>
+          </CardHeader>
+
+          {/* 
+            Make CardContent flex-1 so it fills the remaining vertical space, 
+            then add overflow-y-scroll so its inner content can scroll when needed. 
+          */}
+          <CardContent className="flex-1 overflow-y-scroll">
+            <AuthWrapper
+              defaultTab="signin"
+              onSignInSuccess={handleSignInSuccess}
+              onSignUpSuccess={handleSignUpSuccess}
+              onError={handleError}
+              showSocialAuth={true}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
