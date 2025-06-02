@@ -26,7 +26,7 @@ import {
   Calendar,
   ExternalLink
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format, formatDistanceToNow } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
@@ -53,7 +53,7 @@ const statusConfig = {
 };
 
 export default function JobsManagement() {
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [jobs, setJobs] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
   const [error, setError] = useState<string>('');
@@ -182,7 +182,7 @@ export default function JobsManagement() {
 
   const stats = getJobStats();
 
-  if (!auth.user) {
+  if (!session?.user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <div className="container mx-auto py-16 px-4 max-w-2xl">
@@ -224,7 +224,7 @@ export default function JobsManagement() {
     );
   }
 
-  const userRole = auth.user.role as 'poster' | 'referrer' | 'candidate';
+  const userRole = (session.user.user_metadata?.role || 'referrer') as 'poster' | 'referrer' | 'candidate';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">

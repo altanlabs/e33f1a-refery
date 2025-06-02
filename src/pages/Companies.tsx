@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAppStore } from '@/store';
-import { companyApi } from '@/lib/api';
+import { useAuth } from 'altan-auth';
+import { dbHelpers } from '@/lib/supabase';
 import { Plus, Building, Globe, Users, Loader2 } from 'lucide-react';
 
 export default function Companies() {
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -23,7 +23,7 @@ export default function Companies() {
     try {
       setLoading(true);
       setError('');
-      const data = await companyApi.getAll();
+      const data = await dbHelpers.getCompanies();
       setCompanies(data);
     } catch (err) {
       console.error('Error loading companies:', err);
@@ -33,7 +33,7 @@ export default function Companies() {
     }
   };
 
-  if (!auth.user) {
+  if (!session?.user) {
     return (
       <div className="container mx-auto py-6">
         <Alert>
@@ -56,6 +56,8 @@ export default function Companies() {
     );
   }
 
+  const userRole = session.user.user_metadata?.role || 'referrer';
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
@@ -66,7 +68,7 @@ export default function Companies() {
             Manage companies and their job postings
           </p>
         </div>
-        {auth.user.role === 'poster' && (
+        {userRole === 'poster' && (
           <Button asChild>
             <Link to="/companies/new">
               <Plus className="h-4 w-4 mr-2" />
@@ -154,7 +156,7 @@ export default function Companies() {
                         View Jobs
                       </Link>
                     </Button>
-                    {auth.user.role === 'poster' && (
+                    {userRole === 'poster' && (
                       <Button size="sm" asChild>
                         <Link to={`/companies/${company.id}/edit`}>
                           Edit
@@ -172,12 +174,12 @@ export default function Companies() {
           <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-lg font-medium">No companies found</p>
           <p className="text-muted-foreground mb-4">
-            {auth.user.role === 'poster' 
+            {userRole === 'poster' 
               ? 'Get started by adding your first company.' 
               : 'No companies are currently registered.'
             }
           </p>
-          {auth.user.role === 'poster' && (
+          {userRole === 'poster' && (
             <Button asChild>
               <Link to="/companies/new">
                 <Plus className="h-4 w-4 mr-2" />

@@ -20,13 +20,13 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { dbHelpers } from '@/lib/supabase';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { format } from 'date-fns';
 
 export default function Apply() {
   const { jobId } = useParams();
   const navigate = useNavigate();
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);

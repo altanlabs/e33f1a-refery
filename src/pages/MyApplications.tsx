@@ -21,7 +21,7 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
@@ -34,6 +34,7 @@ const statusConfig = {
 };
 
 export default function MyApplications() {
+  const { session } = useAuth();
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

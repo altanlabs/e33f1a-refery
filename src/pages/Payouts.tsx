@@ -26,7 +26,7 @@ import {
   Plus,
   Loader2
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
@@ -43,6 +43,7 @@ const methodConfig = {
 };
 
 export default function Payouts() {
+  const { session } = useAuth();
   const [payouts, setPayouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

@@ -24,10 +24,10 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 
 export default function Settings() {
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -11,8 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileUpload } from '@/components/ui/FileUpload';
-import { useAppStore } from '@/store';
-import { referralApi, jobApi } from '@/lib/api';
+import { useAuth } from 'altan-auth';
+import { dbHelpers } from '@/lib/supabase';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const referralSchema = z.object({
@@ -27,7 +27,7 @@ type ReferralFormData = z.infer<typeof referralSchema>;
 export default function ReferralForm() {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [step, setStep] = useState(1);
   const [job, setJob] = useState<any>(null);
   const [cv, setCv] = useState<File | null>(null);
@@ -53,7 +53,7 @@ export default function ReferralForm() {
   const loadJob = async () => {
     try {
       if (!jobId) return;
-      const jobData = await jobApi.getById(jobId);
+      const jobData = await dbHelpers.getJobById(jobId);
       setJob(jobData);
     } catch (err) {
       console.error('Error loading job:', err);
@@ -62,14 +62,14 @@ export default function ReferralForm() {
   };
 
   const onSubmit = async (data: ReferralFormData) => {
-    if (!jobId || !auth.user) return;
+    if (!jobId || !session?.user) return;
 
     setLoading(true);
     setError('');
 
     try {
       // Create referral
-      await referralApi.create({
+      await dbHelpers.createReferral({
         candidate_name: data.candidateName,
         candidate_email: data.candidateEmail,
         candidate_linkedin: data.candidateLinkedin || undefined,
@@ -99,7 +99,7 @@ export default function ReferralForm() {
     if (step > 1) setStep(step - 1);
   };
 
-  if (!auth.user) {
+  if (!session?.user) {
     return (
       <div className="container mx-auto py-6">
         <Alert>
@@ -136,7 +136,7 @@ export default function ReferralForm() {
         </Button>
         <h1 className="text-3xl font-bold">Make a Referral</h1>
         <p className="text-muted-foreground">
-          Refer a candidate for {job.title} at {job.company_data?.name}
+          Refer a candidate for {job.title} at {job.company?.name}
         </p>
       </div>
 
@@ -150,7 +150,7 @@ export default function ReferralForm() {
             </span>
           </CardTitle>
           <CardDescription>
-            {job.company_data?.name} • {job.location}
+            {job.company?.name} • {job.location}
           </CardDescription>
         </CardHeader>
         <CardContent>

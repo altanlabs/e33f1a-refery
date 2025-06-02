@@ -12,13 +12,13 @@ import {
   AlertCircle,
   Save
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function NewJob() {
   const navigate = useNavigate();
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -67,8 +67,14 @@ export default function NewJob() {
       return;
     }
 
-    if (!auth.user) {
+    if (!session?.user) {
       setError('You must be logged in to create a job');
+      return;
+    }
+
+    const userRole = session.user.user_metadata?.role || 'referrer';
+    if (userRole !== 'poster') {
+      setError('You must be a poster to create jobs');
       return;
     }
 
@@ -102,7 +108,9 @@ export default function NewJob() {
     }
   };
 
-  if (!auth.user || auth.user.role !== 'poster') {
+  const userRole = session?.user?.user_metadata?.role || 'referrer';
+
+  if (!session?.user || userRole !== 'poster') {
     return (
       <div className="container mx-auto py-8 px-4 max-w-2xl">
         <Card>

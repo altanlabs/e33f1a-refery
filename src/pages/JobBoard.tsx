@@ -2,14 +2,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JobCard } from '@/components/jobs/JobCard';
 import { JobFilters, JobFiltersState } from '@/components/jobs/JobFilters';
-import { useAppStore } from '@/store';
-import { jobApi, companyApi } from '@/lib/api';
+import { useAuth } from 'altan-auth';
+import { dbHelpers } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 
 export default function JobBoard() {
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
@@ -36,8 +36,8 @@ export default function JobBoard() {
       setError('');
       
       const [jobsData, companiesData] = await Promise.all([
-        jobApi.getAll(),
-        companyApi.getAll()
+        dbHelpers.getJobs(),
+        dbHelpers.getCompanies()
       ]);
       
       const filteredJobs = jobsData.filter(job => job.status === 'Open');
@@ -59,7 +59,7 @@ export default function JobBoard() {
         if (
           !job.title?.toLowerCase().includes(searchTerm) &&
           !job.description?.toLowerCase().includes(searchTerm) &&
-          !job.company_data?.name?.toLowerCase().includes(searchTerm)
+          !job.company?.name?.toLowerCase().includes(searchTerm)
         ) {
           return false;
         }
@@ -82,7 +82,7 @@ export default function JobBoard() {
         return false;
       }
 
-      if (filters.company && filters.company !== 'all' && job.company !== filters.company) {
+      if (filters.company && filters.company !== 'all' && job.company?.id !== filters.company) {
         return false;
       }
 
@@ -113,7 +113,7 @@ export default function JobBoard() {
     }
   };
 
-  if (!auth.user) {
+  if (!session?.user) {
     return (
       <div className="container mx-auto py-6">
         <Alert>
@@ -125,7 +125,7 @@ export default function JobBoard() {
     );
   }
 
-  const userRole = auth.user.role as 'referrer' | 'candidate';
+  const userRole = (session.user.user_metadata?.role || 'referrer') as 'referrer' | 'candidate';
 
   if (loading) {
     return (
@@ -202,14 +202,14 @@ export default function JobBoard() {
                   benefits: [],
                   createdAt: job.created_at,
                   closingDate: job.closing_date,
-                  companyId: job.company,
-                  company: job.company_data ? {
-                    id: job.company_data.id,
-                    name: job.company_data.name,
-                    logo: job.company_data.logo,
-                    website: job.company_data.website,
-                    description: job.company_data.description,
-                    createdAt: job.company_data.created_at
+                  companyId: job.company?.id,
+                  company: job.company ? {
+                    id: job.company.id,
+                    name: job.company.name,
+                    logo: job.company.logo,
+                    website: job.company.website,
+                    description: job.company.description,
+                    createdAt: job.company.created_at
                   } : undefined
                 }}
                 userRole={userRole}

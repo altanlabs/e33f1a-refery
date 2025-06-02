@@ -22,19 +22,19 @@ import {
   AlertCircle,
   Camera
 } from 'lucide-react';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { format } from 'date-fns';
 
 export default function Profile() {
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const [profileData, setProfileData] = useState({
-    name: auth.user?.name || '',
-    email: auth.user?.email || '',
+    name: session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || '',
+    email: session?.user?.email || '',
     phone: '',
     location: '',
     bio: '',
@@ -44,7 +44,7 @@ export default function Profile() {
     skills: '',
     linkedin: '',
     website: '',
-    avatar: auth.user?.avatar || ''
+    avatar: session?.user?.user_metadata?.avatar_url || ''
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -79,8 +79,8 @@ export default function Profile() {
     setError(null);
     // Reset form data
     setProfileData({
-      name: auth.user?.name || '',
-      email: auth.user?.email || '',
+      name: session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || '',
+      email: session?.user?.email || '',
       phone: '',
       location: '',
       bio: '',
@@ -90,7 +90,7 @@ export default function Profile() {
       skills: '',
       linkedin: '',
       website: '',
-      avatar: auth.user?.avatar || ''
+      avatar: session?.user?.user_metadata?.avatar_url || ''
     });
   };
 
@@ -107,6 +107,9 @@ export default function Profile() {
       reader.readAsDataURL(file);
     }
   };
+
+  const userRole = session?.user?.user_metadata?.role || 'referrer';
+  const userCreatedAt = session?.user?.created_at || new Date().toISOString();
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
@@ -203,7 +206,7 @@ export default function Profile() {
                 {profileData.email}
               </p>
               <Badge variant="outline" className="mb-4 capitalize">
-                {auth.user?.role}
+                {userRole}
               </Badge>
               
               {profileData.bio && (
@@ -215,7 +218,7 @@ export default function Profile() {
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                   <Calendar className="h-4 w-4 mr-1" />
-                  Joined {format(new Date(auth.user?.createdAt || new Date()), 'MMMM yyyy')}
+                  Joined {format(new Date(userCreatedAt), 'MMMM yyyy')}
                 </div>
               </div>
             </CardContent>

@@ -25,13 +25,13 @@ import {
   Bookmark
 } from 'lucide-react';
 import { dbHelpers } from '@/lib/supabase';
-import { useAppStore } from '@/store';
+import { useAuth } from 'altan-auth';
 import { format } from 'date-fns';
 
 export default function JobDetails() {
   const { jobId } = useParams();
   const navigate = useNavigate();
-  const { auth } = useAppStore();
+  const { session } = useAuth();
   
   const [job, setJob] = useState<any>(null);
   const [applications, setApplications] = useState<any[]>([]);
@@ -223,6 +223,8 @@ export default function JobDetails() {
     );
   }
 
+  const userRole = session?.user?.user_metadata?.role || 'referrer';
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Header */}
@@ -260,7 +262,7 @@ export default function JobDetails() {
             </div>
           </div>
           
-          {auth.user?.role === 'poster' && (
+          {userRole === 'poster' && (
             <div className="flex gap-3">
               <Button variant="outline" size="sm">
                 <Share2 className="h-4 w-4 mr-2" />
@@ -391,7 +393,7 @@ export default function JobDetails() {
               <CardTitle className="text-lg">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {auth.user?.role === 'candidate' && (
+              {userRole === 'candidate' && (
                 <Button asChild className="w-full">
                   <Link to={`/apply/${job.id}`}>
                     Apply Now
@@ -399,7 +401,7 @@ export default function JobDetails() {
                 </Button>
               )}
               
-              {auth.user?.role === 'referrer' && (
+              {userRole === 'referrer' && (
                 <Button asChild className="w-full">
                   <Link to={`/refer/${job.id}`}>
                     Refer Someone
@@ -431,7 +433,7 @@ export default function JobDetails() {
       </div>
 
       {/* Applications & Referrals Tabs */}
-      {auth.user?.role === 'poster' && (
+      {userRole === 'poster' && (
         <div className="mt-8">
           <Tabs defaultValue="applications" className="space-y-6">
             <TabsList>
