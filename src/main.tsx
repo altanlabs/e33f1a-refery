@@ -1,9 +1,12 @@
-import { createRoot } from 'react-dom/client'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import './index.css'
 import './App.css'
 import App from './App'
 
-const root = createRoot(document.getElementById('root')!);
-
-// Remove StrictMode temporarily to avoid altan-auth compatibility issues
-root.render(<App />)
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+)
