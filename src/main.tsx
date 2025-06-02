@@ -4,9 +4,5 @@ import './index.css'
 import './App.css'
 import App from './App'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+// Remove StrictMode to avoid potential React hook issues with altan-auth
+ReactDOM.render(<App />, document.getElementById('root'))
