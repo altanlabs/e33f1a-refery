@@ -61,10 +61,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
+    // Extract the base_id from the supabase key (tenant ID)
+    const baseId = 'da5b0993_a4a7_497e_bdec_1237e9439761'; // From tenant_da5b0993_a4a7_497e_bdec_1237e9439761
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${window.location.origin}/dashboard?base_id=${baseId}`,
+        queryParams: {
+          base_id: baseId
+        }
       },
     });
     if (error) throw error;
