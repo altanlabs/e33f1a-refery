@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/lib/altan-auth';
 import { Menu, LogOut, User, Settings, Briefcase, Users, DollarSign } from 'lucide-react';
 
 export function Navbar() {
