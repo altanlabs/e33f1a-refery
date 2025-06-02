@@ -21,7 +21,7 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
@@ -92,7 +92,7 @@ export default function MyApplications() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="mx-auto max-w-7xl py-8 px-4">
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading applications...</span>
@@ -102,7 +102,7 @@ export default function MyApplications() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
+    <div className="mx-auto max-w-7xl py-8 px-4">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

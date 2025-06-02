@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth';
 import { dbHelpers } from '@/lib/supabase';
 import { 
   Briefcase, 
@@ -134,7 +134,7 @@ export default function Dashboard() {
 
   if (!session?.user) {
     return (
-      <div className="container mx-auto py-6">
+      <div className="mx-auto max-w-7xl py-6 px-4">
         <Alert>
           <AlertDescription>
             Please log in to view your dashboard.
@@ -146,7 +146,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-6 flex items-center justify-center">
+      <div className="mx-auto max-w-7xl py-6 px-4 flex items-center justify-center">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading dashboard...</span>
@@ -293,7 +293,7 @@ export default function Dashboard() {
   const quickActions = getQuickActions();
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="mx-auto max-w-7xl py-6 px-4 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
