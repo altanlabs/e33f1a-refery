@@ -1,19 +1,42 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, AuthWrapper } from 'altan-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Auth() {
-  const { session } = useAuth();
   const navigate = useNavigate();
-  const [error, setError] = useState<string>('');
+  const [useAuth, setUseAuth] = useState<any>(null);
+  const [AuthWrapper, setAuthWrapper] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    if (session?.user) {
-      navigate('/dashboard');
+    // Dynamically import altan-auth hooks
+    const loadAltanAuth = async () => {
+      try {
+        const altanAuth = await import('altan-auth');
+        setUseAuth(() => altanAuth.useAuth);
+        setAuthWrapper(() => altanAuth.AuthWrapper);
+      } catch (error) {
+        console.error('Failed to load altan-auth:', error);
+      }
+    };
+
+    loadAltanAuth();
+  }, []);
+
+  useEffect(() => {
+    if (useAuth) {
+      try {
+        const auth = useAuth();
+        setSession(auth.session);
+        
+        if (auth.session?.user) {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error('Auth hook error:', error);
+      }
     }
-  }, [session, navigate]);
+  }, [useAuth, navigate]);
 
   const handleSignInSuccess = () => {
     navigate('/dashboard');
@@ -25,8 +48,20 @@ export default function Auth() {
 
   const handleError = (error: any) => {
     console.error('Auth error:', error);
-    setError(error.message || 'An authentication error occurred');
   };
+
+  if (!AuthWrapper) {
+    return (
+      <div className="container flex h-screen w-screen flex-col items-center justify-center">
+        <Card className="w-full max-w-lg">
+          <CardContent className="p-12 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading authentication...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
@@ -42,11 +77,6 @@ export default function Auth() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
           <AuthWrapper
             defaultTab="signin"
             onSignInSuccess={handleSignInSuccess}
