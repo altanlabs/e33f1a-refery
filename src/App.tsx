@@ -1,16 +1,15 @@
 import { RouterProvider } from "react-router-dom";
-import { AuthProvider } from 'altan-auth';
-import { supabase } from './lib/supabase';
+import { AuthProviderWrapper } from './components/auth/AuthProviderWrapper';
 import "./index.css";
 import { router } from "./routes";
 
 const App = () => {
   return (
-    <AuthProvider supabase={supabase}>
+    <AuthProviderWrapper>
       <div className="min-h-screen">
         <RouterProvider router={router} />
       </div>
-    </AuthProvider>
+    </AuthProviderWrapper>
   );
 };
 
