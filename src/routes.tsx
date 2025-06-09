@@ -17,6 +17,7 @@ import Apply from "./pages/Apply";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import JobDetails from "./pages/JobDetails";
+import PublicJobDetails from "./pages/PublicJobDetails";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component using stable custom auth
@@ -69,6 +70,10 @@ const routes = [
       },
       {
         path: "jobs/:jobId",
+        element: <PublicJobDetails />,
+      },
+      {
+        path: "jobs/:jobId/manage",
         element: (
           <ProtectedRoute>
             <JobDetails />

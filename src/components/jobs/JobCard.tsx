@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StatusBadge } from './StatusBadge';
 import { Job } from '@/types';
-import { MapPin, DollarSign, Clock, Users } from 'lucide-react';
+import { MapPin, DollarSign, Clock, Users, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface JobCardProps {
@@ -24,19 +24,27 @@ export function JobCard({ job, userRole, candidateCount = 0, onAction }: JobCard
     switch (userRole) {
       case 'poster':
         return (
-          <Button asChild size="sm">
-            <Link to={`/jobs/${job.id}`}>View Details</Link>
+          <Button asChild size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+            <Link to={`/jobs/${job.id}/manage`}>Manage Job</Link>
           </Button>
         );
       case 'referrer':
         return (
-          <Button onClick={() => handleAction('refer')} size="sm">
+          <Button 
+            onClick={() => handleAction('refer')} 
+            size="sm"
+            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+          >
             Refer Someone
           </Button>
         );
       case 'candidate':
         return (
-          <Button asChild size="sm">
+          <Button 
+            asChild 
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+          >
             <Link to={`/apply/${job.id}`}>Apply Now</Link>
           </Button>
         );
@@ -108,13 +116,28 @@ export function JobCard({ job, userRole, candidateCount = 0, onAction }: JobCard
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          {job.closingDate && (
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Closes {formatDistanceToNow(new Date(job.closingDate), { addSuffix: true })}
-            </p>
-          )}
-          <div className="ml-auto">
+        <div className="flex items-center justify-between pt-2 gap-2">
+          <div className="flex-1">
+            {job.closingDate && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Closes {formatDistanceToNow(new Date(job.closingDate), { addSuffix: true })}
+              </p>
+            )}
+          </div>
+          
+          <div className="flex gap-2">
+            <Button 
+              asChild 
+              variant="outline" 
+              size="sm"
+              className="bg-white/50 hover:bg-white/80 backdrop-blur-sm border-gray-200 dark:border-gray-700"
+            >
+              <Link to={`/jobs/${job.id}`}>
+                <Eye className="h-4 w-4 mr-1" />
+                View Details
+              </Link>
+            </Button>
+            
             {getActionButton()}
           </div>
         </div>
