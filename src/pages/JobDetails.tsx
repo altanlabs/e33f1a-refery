@@ -121,10 +121,13 @@ export default function JobDetails() {
     try {
       setSharing(true);
       
+      // Create the proper job URL
+      const jobUrl = `${window.location.origin}/jobs/${job.id}`;
+      
       const shareData = {
         title: `${job.title} at ${job.company?.name}`,
         text: `Check out this job opportunity: ${job.title} at ${job.company?.name}. Referral reward: $${job.reward_amount?.toLocaleString()}`,
-        url: window.location.href
+        url: jobUrl
       };
 
       // Check if Web Share API is supported
@@ -132,21 +135,20 @@ export default function JobDetails() {
         await navigator.share(shareData);
       } else {
         // Fallback: Copy to clipboard
-        await navigator.clipboard.writeText(
-          `${shareData.title}\n${shareData.text}\n${shareData.url}`
-        );
-        alert('Job details copied to clipboard!');
+        await navigator.clipboard.writeText(jobUrl);
+        alert('Job link copied to clipboard!');
       }
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
         console.error('Error sharing job:', err);
         // Fallback: Copy to clipboard
         try {
-          const shareText = `${job.title} at ${job.company?.name}\n${window.location.href}`;
-          await navigator.clipboard.writeText(shareText);
+          const jobUrl = `${window.location.origin}/jobs/${job.id}`;
+          await navigator.clipboard.writeText(jobUrl);
           alert('Job link copied to clipboard!');
         } catch (clipboardErr) {
           console.error('Error copying to clipboard:', clipboardErr);
+          alert('Unable to copy link. Please copy the URL manually.');
         }
       }
     } finally {
