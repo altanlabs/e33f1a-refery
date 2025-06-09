@@ -69,6 +69,14 @@ const routes = [
         ),
       },
       {
+        path: "jobs/new",
+        element: (
+          <ProtectedRoute>
+            <NewJob />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "jobs/:jobId",
         element: <PublicJobDetails />,
       },
@@ -85,14 +93,6 @@ const routes = [
         element: (
           <ProtectedRoute>
             <EditJob />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "jobs/new",
-        element: (
-          <ProtectedRoute>
-            <NewJob />
           </ProtectedRoute>
         ),
       },
