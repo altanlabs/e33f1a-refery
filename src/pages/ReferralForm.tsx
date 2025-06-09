@@ -298,7 +298,7 @@ export default function ReferralForm() {
             <li>• We'll review your referral and contact the candidate</li>
             <li>• The hiring team will evaluate the candidate</li>
             <li>• You'll be notified of any status updates</li>
-            <li>• If hired, you'll receive your ${job.reward_amount?.toLocaleString()} reward!</li>
+            <li>• If hired and successfully passed probation, you'll receive your ${job.reward_amount?.toLocaleString()} reward!</li>
           </ul>
         </CardContent>
       </Card>
