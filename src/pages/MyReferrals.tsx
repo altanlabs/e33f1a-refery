@@ -43,7 +43,7 @@ const rewardStatusConfig = {
 };
 
 export default function MyReferrals() {
-  const { user } = useAuth();
+  const { session } = useAuth();
   const [referrals, setReferrals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,14 +51,17 @@ export default function MyReferrals() {
   const [rewardFilter, setRewardFilter] = useState<string>('all');
 
   useEffect(() => {
-    loadReferrals();
-  }, []);
+    if (session?.user?.id) {
+      loadReferrals();
+    }
+  }, [session?.user?.id]);
 
   const loadReferrals = async () => {
     try {
       setLoading(true);
       const data = await dbHelpers.getReferrals();
-      setReferrals(data || []);
+      const userReferrals = data?.filter(referral => referral.created_by === session?.user?.id) || [];
+      setReferrals(userReferrals);
     } catch (error) {
       console.error('Error loading referrals:', error);
     } finally {
