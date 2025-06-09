@@ -84,42 +84,29 @@ export default function Settings() {
       setRoleChanging(true);
       setError(null);
       
-      // Use the auth service to update user metadata
-      if (service && service.updateUser) {
-        const { error: updateError } = await service.updateUser({
-          data: {
-            ...session?.user?.user_metadata,
-            role: newRole
-          }
-        });
-        
-        if (updateError) throw updateError;
-      } else {
-        // Fallback: try to get the current session and update it
-        const currentSession = await service?.getSession();
-        if (currentSession?.user) {
-          // Try to update using the service's internal supabase client
-          const { error: updateError } = await service.supabase.auth.updateUser({
-            data: {
-              ...currentSession.user.user_metadata,
-              role: newRole
-            }
-          });
-          
-          if (updateError) throw updateError;
-        } else {
-          throw new Error('No active session found');
+      // Use Supabase directly to update user metadata
+      const { data, error: updateError } = await service.supabase.auth.updateUser({
+        data: {
+          role: newRole
         }
+      });
+      
+      if (updateError) {
+        throw updateError;
       }
       
-      handleSettingChange('role', newRole);
-      setSaved(true);
-      
-      // Reset saved state after 3 seconds
-      setTimeout(() => setSaved(false), 3000);
-      
-      // Refresh the page to update the UI with new role
-      setTimeout(() => window.location.reload(), 1000);
+      if (data?.user) {
+        handleSettingChange('role', newRole);
+        setSaved(true);
+        
+        // Reset saved state after 3 seconds
+        setTimeout(() => setSaved(false), 3000);
+        
+        // Refresh the page to update the UI with new role
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        throw new Error('Failed to update user role');
+      }
       
     } catch (err: any) {
       console.error('Error updating role:', err);
