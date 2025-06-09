@@ -31,10 +31,9 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAuth } from 'altan-auth';
-import { supabase } from '@/lib/supabase';
 
 export default function Settings() {
-  const { session } = useAuth();
+  const { session, service } = useAuth();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,15 +84,33 @@ export default function Settings() {
       setRoleChanging(true);
       setError(null);
       
-      // Update user metadata in Supabase Auth
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: {
-          ...session?.user?.user_metadata,
-          role: newRole
+      // Use the auth service to update user metadata
+      if (service && service.updateUser) {
+        const { error: updateError } = await service.updateUser({
+          data: {
+            ...session?.user?.user_metadata,
+            role: newRole
+          }
+        });
+        
+        if (updateError) throw updateError;
+      } else {
+        // Fallback: try to get the current session and update it
+        const currentSession = await service?.getSession();
+        if (currentSession?.user) {
+          // Try to update using the service's internal supabase client
+          const { error: updateError } = await service.supabase.auth.updateUser({
+            data: {
+              ...currentSession.user.user_metadata,
+              role: newRole
+            }
+          });
+          
+          if (updateError) throw updateError;
+        } else {
+          throw new Error('No active session found');
         }
-      });
-      
-      if (updateError) throw updateError;
+      }
       
       handleSettingChange('role', newRole);
       setSaved(true);
@@ -106,7 +123,7 @@ export default function Settings() {
       
     } catch (err: any) {
       console.error('Error updating role:', err);
-      setError('Failed to update role. Please try again.');
+      setError(`Failed to update role: ${err.message || 'Please try again.'}`);
     } finally {
       setRoleChanging(false);
     }
