@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { StatusBadge } from './StatusBadge';
 import { Job } from '@/types';
-import { MapPin, DollarSign, Clock, Eye } from 'lucide-react';
+import { MapPin, DollarSign, Clock, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface JobCardProps {
@@ -19,151 +20,104 @@ export function JobCard({ job, userRole, candidateCount = 0, onAction }: JobCard
     onAction?.(action, job.id);
   };
 
-  const getCompanyInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const getAvatarColor = (name: string) => {
-    const colors = [
-      'bg-blue-500',
-      'bg-green-500', 
-      'bg-purple-500',
-      'bg-orange-500',
-      'bg-pink-500',
-      'bg-indigo-500',
-      'bg-teal-500',
-      'bg-red-500'
-    ];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
+  const getActionButton = () => {
+    switch (userRole) {
+      case 'poster':
+        return (
+          <Button asChild size="sm">
+            <Link to={`/jobs/${job.id}`}>View Details</Link>
+          </Button>
+        );
+      case 'referrer':
+        return (
+          <Button onClick={() => handleAction('refer')} size="sm">
+            Refer Someone
+          </Button>
+        );
+      case 'candidate':
+        return (
+          <Button asChild size="sm">
+            <Link to={`/apply/${job.id}`}>Apply Now</Link>
+          </Button>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-      <CardHeader className="pb-4">
+    <Card className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 rounded-2xl overflow-hidden">
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-3">
-            <div className="relative">
-              <Avatar className={`h-12 w-12 ${getAvatarColor(job.company?.name || 'Company')}`}>
-                <AvatarImage src={job.company?.logo} alt={job.company?.name} />
-                <AvatarFallback className="text-white font-semibold">
-                  {getCompanyInitials(job.company?.name || 'C')}
-                </AvatarFallback>
-              </Avatar>
-              {job.status === 'active' && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-              )}
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg text-gray-900 leading-tight">{job.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{job.company?.name}</p>
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-12 w-12 ring-2 ring-white/50">
+              <AvatarImage src={job.company?.logo} alt={job.company?.name} />
+              <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold">
+                {job.company?.name?.charAt(0) || 'C'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="font-bold text-lg leading-none text-gray-900 dark:text-white">{job.title}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {job.company?.name}
+              </p>
             </div>
           </div>
-          <Badge 
-            variant={job.status === 'active' ? 'default' : 'secondary'} 
-            className={job.status === 'active' ? 'bg-green-100 text-green-800 border-green-200' : ''}
-          >
-            {job.status === 'active' ? 'Active' : 'Closed'}
-          </Badge>
+          <StatusBadge status={job.status} />
         </div>
       </CardHeader>
-      
       <CardContent className="space-y-4">
-        <p className="text-sm text-gray-600 line-clamp-2">
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
           {job.description}
         </p>
         
-        <div className="space-y-2">
-          <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-            {job.location || 'Remote'}
+        <div className="flex flex-wrap gap-2">
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <MapPin className="h-4 w-4 mr-1" />
+            {job.location}
           </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <DollarSign className="h-4 w-4 mr-2 text-gray-400" />
-            ${job.rewardAmount?.toLocaleString() || '0'}
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <DollarSign className="h-4 w-4 mr-1" />
+            ${job.rewardAmount.toLocaleString()} reward
           </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Clock className="h-4 w-4 mr-2 text-gray-400" />
+          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+            <Clock className="h-4 w-4 mr-1" />
             {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
           </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Clock className="h-4 w-4 mr-2 text-gray-400" />
-            {job.type}
-          </div>
-        </div>
-
-        {/* Requirements/Skills */}
-        {job.requirements && job.requirements.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-1">
-              {job.requirements.slice(0, 3).map((req, index) => (
-                <Badge key={index} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                  {req}
-                </Badge>
-              ))}
-              {job.requirements.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{job.requirements.length - 3} more
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-2 space-x-2">
-          {userRole === 'referrer' && (
-            <Button 
-              onClick={() => handleAction('refer')} 
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white flex-1"
-            >
-              Refer Someone
-            </Button>
-          )}
-          {userRole === 'candidate' && (
-            <Button 
-              asChild 
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white flex-1"
-            >
-              <Link to={`/apply/${job.id}`}>Apply Now</Link>
-            </Button>
-          )}
           {userRole === 'poster' && (
-            <Button 
-              asChild 
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white flex-1"
-            >
-              <Link to={`/jobs/${job.id}`}>Manage Job</Link>
-            </Button>
+            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+              <Users className="h-4 w-4 mr-1" />
+              {candidateCount} candidates
+            </div>
           )}
-          
-          <Button 
-            variant="outline" 
-            size="sm"
-            asChild
-            className="flex items-center"
-          >
-            <Link to={`/jobs/${job.id}`}>
-              <Eye className="h-4 w-4 mr-1" />
-              View Details
-            </Link>
-          </Button>
         </div>
 
-        {/* Additional Info */}
-        {job.closingDate && (
-          <p className="text-xs text-gray-500 pt-2 border-t">
-            Looking for a {job.type.toLowerCase()} {job.title.toLowerCase()} to help us find top talent.
-          </p>
-        )}
+        <div className="flex flex-wrap gap-1">
+          <Badge variant="outline" className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800">
+            {job.type}
+          </Badge>
+          {job.requirements.slice(0, 2).map((req, index) => (
+            <Badge key={index} variant="secondary" className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+              {req}
+            </Badge>
+          ))}
+          {job.requirements.length > 2 && (
+            <Badge variant="secondary" className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+              +{job.requirements.length - 2} more
+            </Badge>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between pt-2">
+          {job.closingDate && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Closes {formatDistanceToNow(new Date(job.closingDate), { addSuffix: true })}
+            </p>
+          )}
+          <div className="ml-auto">
+            {getActionButton()}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
