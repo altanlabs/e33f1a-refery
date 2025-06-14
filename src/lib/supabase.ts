@@ -182,6 +182,66 @@ export interface Database {
           referral?: string;
         };
       };
+      candidates: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          linkedin?: string;
+          whatsapp?: string;
+          cv?: string;
+          role_interest?: 'Engineering' | 'Product' | 'Growth' | 'Design' | 'Sales' | 'Marketing' | 'Operations' | 'Other';
+          status?: 'Not Submitted' | 'Submitted' | 'Interviewing' | 'Hired' | 'Rejected';
+          referrer_id: string;
+          recommendation?: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          name: string;
+          email: string;
+          linkedin?: string;
+          whatsapp?: string;
+          cv?: string;
+          role_interest?: 'Engineering' | 'Product' | 'Growth' | 'Design' | 'Sales' | 'Marketing' | 'Operations' | 'Other';
+          status?: 'Not Submitted' | 'Submitted' | 'Interviewing' | 'Hired' | 'Rejected';
+          referrer_id: string;
+          recommendation?: string;
+        };
+        Update: {
+          name?: string;
+          email?: string;
+          linkedin?: string;
+          whatsapp?: string;
+          cv?: string;
+          role_interest?: 'Engineering' | 'Product' | 'Growth' | 'Design' | 'Sales' | 'Marketing' | 'Operations' | 'Other';
+          status?: 'Not Submitted' | 'Submitted' | 'Interviewing' | 'Hired' | 'Rejected';
+          referrer_id?: string;
+          recommendation?: string;
+        };
+      };
+      referrer_profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          username: string;
+          intro_message?: string;
+          profile_image?: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          username: string;
+          intro_message?: string;
+          profile_image?: string;
+        };
+        Update: {
+          username?: string;
+          intro_message?: string;
+          profile_image?: string;
+        };
+      };
     };
   };
 }
@@ -386,5 +446,145 @@ export const dbHelpers = {
     
     if (error) throw error;
     return data;
+  },
+
+  // Candidates
+  async getCandidates() {
+    const { data, error } = await supabase
+      .from('candidates')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getCandidatesByReferrer(referrerId: string) {
+    const { data, error } = await supabase
+      .from('candidates')
+      .select('*')
+      .eq('referrer_id', referrerId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createCandidate(candidate: Database['public']['Tables']['candidates']['Insert']) {
+    const { data, error } = await supabase
+      .from('candidates')
+      .insert(candidate)
+      .select();
+    
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('Failed to create candidate');
+    return data[0];
+  },
+
+  async updateCandidate(id: string, updates: Database['public']['Tables']['candidates']['Update']) {
+    const { data, error } = await supabase
+      .from('candidates')
+      .update(updates)
+      .eq('id', id)
+      .select();
+    
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('Failed to update candidate');
+    return data[0];
+  },
+
+  async getCandidateById(id: string) {
+    const { data, error } = await supabase
+      .from('candidates')
+      .select('*')
+      .eq('id', id);
+    
+    if (error) throw error;
+    return data?.[0] || null;
+  },
+
+  // Referrer Profiles
+  async getReferrerProfile(userId: string) {
+    const { data, error } = await supabase
+      .from('referrer_profiles')
+      .select('*')
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    return data?.[0] || null;
+  },
+
+  async getReferrerProfileByUsername(username: string) {
+    const { data, error } = await supabase
+      .from('referrer_profiles')
+      .select('*')
+      .eq('username', username);
+    
+    if (error) throw error;
+    return data?.[0] || null;
+  },
+
+  async createReferrerProfile(profile: Database['public']['Tables']['referrer_profiles']['Insert']) {
+    const { data, error } = await supabase
+      .from('referrer_profiles')
+      .insert(profile)
+      .select();
+    
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('Failed to create referrer profile');
+    return data[0];
+  },
+
+  async updateReferrerProfile(userId: string, updates: Database['public']['Tables']['referrer_profiles']['Update']) {
+    const { data, error } = await supabase
+      .from('referrer_profiles')
+      .update(updates)
+      .eq('user_id', userId)
+      .select();
+    
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('Failed to update referrer profile');
+    return data[0];
+  },
+
+  // Job suggestions based on candidate profile
+  async suggestJobsForCandidate(candidateId: string) {
+    const candidate = await this.getCandidateById(candidateId);
+    if (!candidate) return [];
+
+    const { data, error } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        company:companies(*)
+      `)
+      .eq('status', 'Open')
+      .order('created_at', { ascending: false })
+      .limit(3);
+    
+    if (error) throw error;
+    
+    // Simple keyword matching based on role interest
+    const roleKeywords = {
+      'Engineering': ['engineer', 'developer', 'software', 'technical', 'backend', 'frontend', 'fullstack'],
+      'Product': ['product', 'manager', 'pm', 'strategy', 'roadmap'],
+      'Growth': ['growth', 'marketing', 'acquisition', 'retention', 'analytics'],
+      'Design': ['design', 'ui', 'ux', 'visual', 'creative'],
+      'Sales': ['sales', 'business development', 'account', 'revenue'],
+      'Marketing': ['marketing', 'content', 'social', 'brand', 'campaign'],
+      'Operations': ['operations', 'ops', 'process', 'logistics', 'supply'],
+    };
+
+    if (candidate.role_interest && roleKeywords[candidate.role_interest]) {
+      const keywords = roleKeywords[candidate.role_interest];
+      const filtered = data?.filter(job => {
+        const searchText = `${job.title} ${job.description} ${job.requirements}`.toLowerCase();
+        return keywords.some(keyword => searchText.includes(keyword));
+      }) || [];
+      
+      return filtered.slice(0, 3);
+    }
+
+    return data?.slice(0, 3) || [];
   }
 };

@@ -12,12 +12,14 @@ import EditJob from "./pages/EditJob";
 import ReferralForm from "./pages/ReferralForm";
 import MyReferrals from "./pages/MyReferrals";
 import MyApplications from "./pages/MyApplications";
+import MyCandidates from "./pages/MyCandidates";
 import Payouts from "./pages/Payouts";
 import Apply from "./pages/Apply";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import JobDetails from "./pages/JobDetails";
 import PublicJobDetails from "./pages/PublicJobDetails";
+import ReferralLanding from "./pages/ReferralLanding";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component using stable custom auth
@@ -129,6 +131,14 @@ const routes = [
         ),
       },
       {
+        path: "my-candidates",
+        element: (
+          <ProtectedRoute>
+            <MyCandidates />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "my-applications",
         element: (
           <ProtectedRoute>
@@ -159,6 +169,10 @@ const routes = [
             <Settings />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "r/:username",
+        element: <ReferralLanding />,
       },
       {
         path: "*",

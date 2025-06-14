@@ -137,6 +137,7 @@ export function ChatSidebar() {
                 { label: "View Dashboard", href: "/dashboard" },
                 { label: "Browse Jobs", href: "/opportunities" },
                 { label: "My Referrals", href: "/my-referrals" },
+                { label: "My Candidates", href: "/my-candidates" },
                 { label: "Account Settings", href: "/settings" }
               ].map((link, index) => (
                 <Button

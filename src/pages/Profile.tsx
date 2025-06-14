@@ -20,9 +20,15 @@ import {
   CheckCircle,
   Loader2,
   AlertCircle,
-  Camera
+  Camera,
+  Link as LinkIcon,
+  Copy,
+  Share2,
+  ExternalLink,
+  Plus
 } from 'lucide-react';
 import { useAuth } from 'altan-auth';
+import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 
 export default function Profile() {
@@ -31,6 +37,8 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [referrerProfile, setReferrerProfile] = useState<any>(null);
   
   const [profileData, setProfileData] = useState({
     name: session?.user?.user_metadata?.full_name || session?.user?.email?.split('@')[0] || '',
@@ -47,6 +55,32 @@ export default function Profile() {
     avatar: session?.user?.user_metadata?.avatar_url || ''
   });
 
+  const [referralLinkData, setReferralLinkData] = useState({
+    username: '',
+    intro_message: "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
+  });
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      loadReferrerProfile();
+    }
+  }, [session?.user?.id]);
+
+  const loadReferrerProfile = async () => {
+    try {
+      const profile = await dbHelpers.getReferrerProfile(session?.user?.id!);
+      if (profile) {
+        setReferrerProfile(profile);
+        setReferralLinkData({
+          username: profile.username,
+          intro_message: profile.intro_message || "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
+        });
+      }
+    } catch (error) {
+      console.error('Error loading referrer profile:', error);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setProfileData(prev => ({
       ...prev,
@@ -54,21 +88,52 @@ export default function Profile() {
     }));
   };
 
+  const handleReferralLinkChange = (field: string, value: string) => {
+    setReferralLinkData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const generateUsername = () => {
+    const name = profileData.name.toLowerCase().replace(/\s+/g, '');
+    const randomNum = Math.floor(Math.random() * 1000);
+    return `${name}${randomNum}`;
+  };
+
   const handleSave = async () => {
     try {
       setSaving(true);
       setError(null);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save referrer profile if user is a referrer
+      const userRole = session?.user?.user_metadata?.role || 'referrer';
+      if (userRole === 'referrer' && referralLinkData.username.trim()) {
+        if (referrerProfile) {
+          // Update existing profile
+          await dbHelpers.updateReferrerProfile(session?.user?.id!, {
+            username: referralLinkData.username.trim(),
+            intro_message: referralLinkData.intro_message.trim()
+          });
+        } else {
+          // Create new profile
+          await dbHelpers.createReferrerProfile({
+            user_id: session?.user?.id!,
+            username: referralLinkData.username.trim(),
+            intro_message: referralLinkData.intro_message.trim()
+          });
+        }
+        await loadReferrerProfile();
+      }
       
       setSaved(true);
       setEditing(false);
       
       // Reset saved state after 3 seconds
       setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
-      setError('Failed to save profile. Please try again.');
+    } catch (err: any) {
+      console.error('Error saving profile:', err);
+      setError(err.message || 'Failed to save profile. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -92,6 +157,13 @@ export default function Profile() {
       website: '',
       avatar: session?.user?.user_metadata?.avatar_url || ''
     });
+    
+    if (referrerProfile) {
+      setReferralLinkData({
+        username: referrerProfile.username,
+        intro_message: referrerProfile.intro_message || "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
+      });
+    }
   };
 
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,6 +178,20 @@ export default function Profile() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const copyReferralLink = async () => {
+    if (!referrerProfile?.username) return;
+    
+    const link = `${window.location.origin}/r/${referrerProfile.username}`;
+    await navigator.clipboard.writeText(link);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const openReferralLink = () => {
+    if (!referrerProfile?.username) return;
+    window.open(`${window.location.origin}/r/${referrerProfile.username}`, '_blank');
   };
 
   const userRole = session?.user?.user_metadata?.role || 'referrer';
@@ -227,6 +313,138 @@ export default function Profile() {
 
         {/* Profile Details */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Referral Link Management - Only for Referrers */}
+          {userRole === 'referrer' && (
+            <Card className="border-emerald-200 bg-emerald-50/50 dark:bg-emerald-900/10">
+              <CardHeader>
+                <CardTitle className="flex items-center text-emerald-800 dark:text-emerald-300">
+                  <LinkIcon className="h-5 w-5 mr-2" />
+                  Your Referral Link
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {referrerProfile?.username ? (
+                  <div className="space-y-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
+                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Your Link</Label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="flex-1 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded text-sm">
+                          refery.io/r/{referrerProfile.username}
+                        </code>
+                        <Button size="sm" variant="outline" onClick={copyReferralLink}>
+                          {linkCopied ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            </>
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={openReferralLink}>
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {editing && (
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="username">Username</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="username"
+                              value={referralLinkData.username}
+                              onChange={(e) => handleReferralLinkChange('username', e.target.value)}
+                              placeholder="yourname"
+                              className="flex-1"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={() => handleReferralLinkChange('username', generateUsername())}
+                            >
+                              Generate
+                            </Button>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            This will be your unique referral link: refery.io/r/{referralLinkData.username || 'username'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="intro_message">Personal Message</Label>
+                          <Textarea
+                            id="intro_message"
+                            value={referralLinkData.intro_message}
+                            onChange={(e) => handleReferralLinkChange('intro_message', e.target.value)}
+                            placeholder="Write a personal message that candidates will see on your referral page..."
+                            rows={3}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            This message will appear on your referral landing page
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <LinkIcon className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      Create Your Referral Link
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      Set up your personalized referral link to start receiving candidate submissions
+                    </p>
+                    {!editing && (
+                      <Button onClick={() => setEditing(true)} className="bg-emerald-500 hover:bg-emerald-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Set Up Link
+                      </Button>
+                    )}
+                    {editing && (
+                      <div className="space-y-4 text-left">
+                        <div>
+                          <Label htmlFor="username">Choose Username</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="username"
+                              value={referralLinkData.username}
+                              onChange={(e) => handleReferralLinkChange('username', e.target.value)}
+                              placeholder="yourname"
+                              className="flex-1"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={() => handleReferralLinkChange('username', generateUsername())}
+                            >
+                              Generate
+                            </Button>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Your link will be: refery.io/r/{referralLinkData.username || 'username'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="intro_message">Personal Message</Label>
+                          <Textarea
+                            id="intro_message"
+                            value={referralLinkData.intro_message}
+                            onChange={(e) => handleReferralLinkChange('intro_message', e.target.value)}
+                            placeholder="Write a personal message that candidates will see..."
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Personal Information */}
           <Card>
             <CardHeader>
