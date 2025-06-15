@@ -82,6 +82,23 @@ export interface Payout {
   processedAt?: string;
 }
 
+export interface ScoutApplication {
+  id: string;
+  full_name: string;
+  email: string;
+  linkedin_url: string;
+  role: 'Founder' | 'Operator' | 'Investor' | 'Other';
+  cv_upload?: string;
+  referral_example: string;
+  trust_agreement: boolean;
+  status: 'pending' | 'approved' | 'declined';
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AuthState {
   user: User | null;
   isLoading: boolean;
@@ -96,4 +113,5 @@ export interface AppState {
   applications: Application[];
   candidates: Candidate[];
   payouts: Payout[];
+  scoutApplications: ScoutApplication[];
 }
