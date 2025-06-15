@@ -133,10 +133,10 @@ export default function ReferralLanding() {
       await dbHelpers.createCandidate({
         name: data.name,
         email: data.email,
-        linkedin: data.linkedin || undefined,
+        linkedin_url: data.linkedin || undefined,
         whatsapp: data.whatsapp || undefined,
         role_interest: data.role_interest,
-        referrer_id: referrerProfile.user_id,
+        referrer: referrerProfile.id, 
         status: 'Not Submitted',
       });
 
@@ -192,7 +192,7 @@ export default function ReferralLanding() {
               </div>
               
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Thank you! 🎉
+                Thank you! 
               </h1>
               
               <p className="text-xl text-gray-600 mb-8">
@@ -243,7 +243,7 @@ export default function ReferralLanding() {
             </Avatar>
             <div>
               <h1 className="text-3xl font-bold">
-                Hi! I'm {referrerProfile?.username} 👋
+                Hi! I'm {referrerProfile?.username} 
               </h1>
               <p className="text-emerald-100 text-lg">
                 {referrerProfile?.intro_message || "I'd love to help you find your dream job!"}
@@ -261,7 +261,7 @@ export default function ReferralLanding() {
               <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50">
                 <CardTitle className="flex items-center text-2xl text-gray-900">
                   <Briefcase className="h-6 w-6 mr-3 text-emerald-500" />
-                  You're just one intro away from helping a friend land a dream job 💼
+                  You're just one intro away from helping a friend land a dream job 
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8">

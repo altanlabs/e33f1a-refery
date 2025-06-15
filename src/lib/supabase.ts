@@ -187,12 +187,12 @@ export interface Database {
           id: string;
           name: string;
           email: string;
-          linkedin?: string;
+          linkedin_url?: string;
           whatsapp?: string;
           cv?: string;
           role_interest?: 'Engineering' | 'Product' | 'Growth' | 'Design' | 'Sales' | 'Marketing' | 'Operations' | 'Other';
           status?: 'Not Submitted' | 'Submitted' | 'Interviewing' | 'Hired' | 'Rejected';
-          referrer_id: string;
+          referrer: string;
           recommendation?: string;
           created_at: string;
           updated_at: string;
@@ -200,23 +200,23 @@ export interface Database {
         Insert: {
           name: string;
           email: string;
-          linkedin?: string;
+          linkedin_url?: string;
           whatsapp?: string;
           cv?: string;
           role_interest?: 'Engineering' | 'Product' | 'Growth' | 'Design' | 'Sales' | 'Marketing' | 'Operations' | 'Other';
           status?: 'Not Submitted' | 'Submitted' | 'Interviewing' | 'Hired' | 'Rejected';
-          referrer_id: string;
+          referrer: string;
           recommendation?: string;
         };
         Update: {
           name?: string;
           email?: string;
-          linkedin?: string;
+          linkedin_url?: string;
           whatsapp?: string;
           cv?: string;
           role_interest?: 'Engineering' | 'Product' | 'Growth' | 'Design' | 'Sales' | 'Marketing' | 'Operations' | 'Other';
           status?: 'Not Submitted' | 'Submitted' | 'Interviewing' | 'Hired' | 'Rejected';
-          referrer_id?: string;
+          referrer?: string;
           recommendation?: string;
         };
       };
@@ -225,7 +225,7 @@ export interface Database {
           id: string;
           user_id: string;
           username: string;
-          intro_message?: string;
+          personal_message?: string;
           profile_image?: string;
           created_at: string;
           updated_at: string;
@@ -233,13 +233,36 @@ export interface Database {
         Insert: {
           user_id: string;
           username: string;
-          intro_message?: string;
+          personal_message?: string;
           profile_image?: string;
         };
         Update: {
           username?: string;
-          intro_message?: string;
+          personal_message?: string;
           profile_image?: string;
+        };
+      };
+      candidate_job_matches: {
+        Row: {
+          id: string;
+          candidate: string;
+          job: string;
+          match_score?: number;
+          status?: 'Suggested' | 'Applied' | 'Not Interested';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          candidate: string;
+          job: string;
+          match_score?: number;
+          status?: 'Suggested' | 'Applied' | 'Not Interested';
+        };
+        Update: {
+          candidate?: string;
+          job?: string;
+          match_score?: number;
+          status?: 'Suggested' | 'Applied' | 'Not Interested';
         };
       };
     };
@@ -463,7 +486,7 @@ export const dbHelpers = {
     const { data, error } = await supabase
       .from('candidates')
       .select('*')
-      .eq('referrer_id', referrerId)
+      .eq('referrer', referrerId)
       .order('created_at', { ascending: false });
     
     if (error) throw error;

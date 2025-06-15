@@ -66,16 +66,18 @@ export default function MyCandidates() {
     try {
       setLoading(true);
       
-      // Load candidates, jobs, and referrer profile in parallel
-      const [candidatesData, jobsData, profileData] = await Promise.all([
-        dbHelpers.getCandidatesByReferrer(session?.user?.id!),
-        dbHelpers.getJobs(),
-        dbHelpers.getReferrerProfile(session?.user?.id!)
+      // First get the referrer profile to get the profile ID
+      const profileData = await dbHelpers.getReferrerProfile(session?.user?.id!);
+      setReferrerProfile(profileData);
+      
+      // Load candidates using the referrer profile ID, and jobs
+      const [candidatesData, jobsData] = await Promise.all([
+        profileData ? dbHelpers.getCandidatesByReferrer(profileData.id) : [],
+        dbHelpers.getJobs()
       ]);
 
       setCandidates(candidatesData || []);
       setJobs(jobsData?.filter(job => job.status === 'Open') || []);
-      setReferrerProfile(profileData);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {

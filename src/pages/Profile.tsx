@@ -57,7 +57,7 @@ export default function Profile() {
 
   const [referralLinkData, setReferralLinkData] = useState({
     username: '',
-    intro_message: "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
+    personal_message: "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
   });
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function Profile() {
         setReferrerProfile(profile);
         setReferralLinkData({
           username: profile.username,
-          intro_message: profile.intro_message || "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
+          personal_message: profile.personal_message || "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
         });
       }
     } catch (error) {
@@ -117,14 +117,14 @@ export default function Profile() {
               // Update existing profile
               await dbHelpers.updateReferrerProfile(session?.user?.id!, {
                 username: referralLinkData.username.trim(),
-                intro_message: referralLinkData.intro_message.trim()
+                personal_message: referralLinkData.personal_message.trim()
               });
             } else {
               // Create new profile
               await dbHelpers.createReferrerProfile({
                 user_id: session?.user?.id!,
                 username: referralLinkData.username.trim(),
-                intro_message: referralLinkData.intro_message.trim()
+                personal_message: referralLinkData.personal_message.trim()
               });
             }
             await loadReferrerProfile();
@@ -175,7 +175,7 @@ export default function Profile() {
     if (referrerProfile) {
       setReferralLinkData({
         username: referrerProfile.username,
-        intro_message: referrerProfile.intro_message || "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
+        personal_message: referrerProfile.personal_message || "I'd love to help you find your dream job! Submit your profile below and I'll connect you with relevant opportunities."
       });
     }
   };
@@ -386,11 +386,11 @@ export default function Profile() {
                         </div>
 
                         <div>
-                          <Label htmlFor="intro_message">Personal Message</Label>
+                          <Label htmlFor="personal_message">Personal Message</Label>
                           <Textarea
-                            id="intro_message"
-                            value={referralLinkData.intro_message}
-                            onChange={(e) => handleReferralLinkChange('intro_message', e.target.value)}
+                            id="personal_message"
+                            value={referralLinkData.personal_message}
+                            onChange={(e) => handleReferralLinkChange('personal_message', e.target.value)}
                             placeholder="Write a personal message that candidates will see on your referral page..."
                             rows={3}
                           />
@@ -442,11 +442,11 @@ export default function Profile() {
                         </div>
 
                         <div>
-                          <Label htmlFor="intro_message">Personal Message</Label>
+                          <Label htmlFor="personal_message">Personal Message</Label>
                           <Textarea
-                            id="intro_message"
-                            value={referralLinkData.intro_message}
-                            onChange={(e) => handleReferralLinkChange('intro_message', e.target.value)}
+                            id="personal_message"
+                            value={referralLinkData.personal_message}
+                            onChange={(e) => handleReferralLinkChange('personal_message', e.target.value)}
                             placeholder="Write a personal message that candidates will see..."
                             rows={3}
                           />
