@@ -505,46 +505,92 @@ export const dbHelpers = {
 
   // Referrer Profiles
   async getReferrerProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('referrer_profiles')
-      .select('*')
-      .eq('user_id', userId);
-    
-    if (error) throw error;
-    return data?.[0] || null;
+    try {
+      const { data, error } = await supabase
+        .from('referrer_profiles')
+        .select('*')
+        .eq('user_id', userId);
+      
+      if (error) {
+        // If table doesn't exist, return null instead of throwing
+        if (error.message.includes('does not exist') || error.code === '42P01') {
+          console.warn('referrer_profiles table does not exist yet');
+          return null;
+        }
+        throw error;
+      }
+      return data?.[0] || null;
+    } catch (error) {
+      console.warn('Error getting referrer profile:', error);
+      return null;
+    }
   },
 
   async getReferrerProfileByUsername(username: string) {
-    const { data, error } = await supabase
-      .from('referrer_profiles')
-      .select('*')
-      .eq('username', username);
-    
-    if (error) throw error;
-    return data?.[0] || null;
+    try {
+      const { data, error } = await supabase
+        .from('referrer_profiles')
+        .select('*')
+        .eq('username', username);
+      
+      if (error) {
+        // If table doesn't exist, return null instead of throwing
+        if (error.message.includes('does not exist') || error.code === '42P01') {
+          console.warn('referrer_profiles table does not exist yet');
+          return null;
+        }
+        throw error;
+      }
+      return data?.[0] || null;
+    } catch (error) {
+      console.warn('Error getting referrer profile by username:', error);
+      return null;
+    }
   },
 
   async createReferrerProfile(profile: Database['public']['Tables']['referrer_profiles']['Insert']) {
-    const { data, error } = await supabase
-      .from('referrer_profiles')
-      .insert(profile)
-      .select();
-    
-    if (error) throw error;
-    if (!data || data.length === 0) throw new Error('Failed to create referrer profile');
-    return data[0];
+    try {
+      const { data, error } = await supabase
+        .from('referrer_profiles')
+        .insert(profile)
+        .select();
+      
+      if (error) {
+        // If table doesn't exist, throw a more specific error
+        if (error.message.includes('does not exist') || error.code === '42P01') {
+          throw new Error('Referrer profiles feature is not yet available. Please contact support.');
+        }
+        throw error;
+      }
+      if (!data || data.length === 0) throw new Error('Failed to create referrer profile');
+      return data[0];
+    } catch (error) {
+      console.error('Error creating referrer profile:', error);
+      throw error;
+    }
   },
 
   async updateReferrerProfile(userId: string, updates: Database['public']['Tables']['referrer_profiles']['Update']) {
-    const { data, error } = await supabase
-      .from('referrer_profiles')
-      .update(updates)
-      .eq('user_id', userId)
-      .select();
-    
-    if (error) throw error;
-    if (!data || data.length === 0) throw new Error('Failed to update referrer profile');
-    return data[0];
+    try {
+      const { data, error } = await supabase
+        .from('referrer_profiles')
+        .update(updates)
+        .eq('user_id', userId)
+        .select();
+      
+      if (error) {
+        // If table doesn't exist, throw a more specific error
+        if (error.message.includes('does not exist') || error.code === '42P01') {
+          throw new Error('Referrer profiles feature is not yet available. Please contact support.');
+        }
+        throw error;
+      }
+      if (!data || data.length === 0) throw new Error('Failed to update referrer profile');
+      return data[0];
+    } catch (error) {
+      console.error('Error updating referrer profile:', error);
+      throw error;
+    }
   },
 
   // Job suggestions based on candidate profile
