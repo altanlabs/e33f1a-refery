@@ -1,10 +1,10 @@
 import { RouterProvider } from "react-router-dom";
-import { AuthProvider } from 'altan-auth';
+import { AuthProvider } from './lib/auth-fallback';
 import { supabase } from './lib/supabase';
 import "./index.css";
 import { router } from "./routes";
 
-const App = () => {
+function App() {
   return (
     <AuthProvider supabase={supabase}>
       <div className="min-h-screen">
@@ -12,6 +12,6 @@ const App = () => {
       </div>
     </AuthProvider>
   );
-};
+}
 
 export default App;
