@@ -4,7 +4,7 @@ import { supabase } from './lib/supabase';
 import "./index.css";
 import { router } from "./routes";
 
-function App() {
+export default function App() {
   return (
     <AuthProvider supabase={supabase}>
       <div className="min-h-screen">
@@ -13,5 +13,3 @@ function App() {
     </AuthProvider>
   );
 }
-
-export default App;
