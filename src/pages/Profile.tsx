@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   User, 
   Mail, 
@@ -25,14 +26,20 @@ import {
   Copy,
   Share2,
   ExternalLink,
-  Plus
+  Plus,
+  Twitter,
+  Linkedin,
+  Eye,
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Profile() {
   const { session } = useAuth();
+  const { toast } = useToast();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -197,15 +204,36 @@ export default function Profile() {
   const copyReferralLink = async () => {
     if (!referrerProfile?.username) return;
     
-    const link = `${window.location.origin}/r/${referrerProfile.username}`;
+    const link = `https://refery.io/r/${referrerProfile.username}`;
     await navigator.clipboard.writeText(link);
     setLinkCopied(true);
+    
+    toast({
+      title: "Copied! ",
+      description: "Anyone who applies via this link will be connected to you.",
+    });
+    
     setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const shareOnTwitter = () => {
+    if (!referrerProfile?.username) return;
+    const link = `https://refery.io/r/${referrerProfile.username}`;
+    const text = "Looking for your next career opportunity? I can help connect you with amazing roles. Apply through my referral link:";
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`;
+    window.open(url, '_blank');
+  };
+
+  const shareOnLinkedIn = () => {
+    if (!referrerProfile?.username) return;
+    const link = `https://refery.io/r/${referrerProfile.username}`;
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`;
+    window.open(url, '_blank');
   };
 
   const openReferralLink = () => {
     if (!referrerProfile?.username) return;
-    window.open(`${window.location.origin}/r/${referrerProfile.username}`, '_blank');
+    window.open(`https://refery.io/r/${referrerProfile.username}`, '_blank');
   };
 
   const userRole = session?.user?.user_metadata?.role || 'referrer';
@@ -329,7 +357,7 @@ export default function Profile() {
         <div className="lg:col-span-2 space-y-6">
           {/* Referral Link Management - Only for Referrers */}
           {userRole === 'referrer' && (
-            <Card className="border-emerald-200 bg-emerald-50/50 dark:bg-emerald-900/10">
+            <Card className="border-emerald-200 bg-emerald-50/50 dark:bg-emerald-900/10 dark:border-emerald-800">
               <CardHeader>
                 <CardTitle className="flex items-center text-emerald-800 dark:text-emerald-300">
                   <LinkIcon className="h-5 w-5 mr-2" />
@@ -339,32 +367,81 @@ export default function Profile() {
               <CardContent className="space-y-4">
                 {referrerProfile?.username ? (
                   <div className="space-y-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
-                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Your Link</Label>
-                      <div className="flex items-center gap-2 mt-1">
-                        <code className="flex-1 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded text-sm">
-                          refery.io/r/{referrerProfile.username}
-                        </code>
-                        <Button size="sm" variant="outline" onClick={copyReferralLink}>
+                    {/* Main Referral Link Display */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-emerald-200 dark:border-emerald-700 shadow-sm">
+                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
+                        Your Referral Link
+                      </Label>
+                      <div className="flex items-center gap-3 mb-4">
+                        <Input
+                          value={`https://refery.io/r/${referrerProfile.username}`}
+                          readOnly
+                          className="flex-1 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 font-mono text-sm"
+                        />
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={copyReferralLink}
+                          className="px-4 py-2 min-w-[80px]"
+                        >
                           {linkCopied ? (
                             <>
-                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
+                              Copied 
                             </>
                           ) : (
-                            <Copy className="h-4 w-4" />
+                            <>
+                              <Copy className="h-4 w-4 mr-1" />
+                              Copy
+                            </>
                           )}
                         </Button>
-                        <Button size="sm" variant="outline" onClick={openReferralLink}>
-                          <ExternalLink className="h-4 w-4" />
+                      </div>
+
+                      {/* Share Buttons */}
+                      <div className="flex items-center gap-3">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="px-4 py-2">
+                              <Share2 className="h-4 w-4 mr-1" />
+                              Share
+                              <ChevronDown className="h-3 w-3 ml-1" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-48">
+                            <DropdownMenuItem onClick={shareOnTwitter} className="cursor-pointer">
+                              <Twitter className="h-4 w-4 mr-2 text-blue-500" />
+                              Share on Twitter
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={shareOnLinkedIn} className="cursor-pointer">
+                              <Linkedin className="h-4 w-4 mr-2 text-blue-600" />
+                              Share on LinkedIn
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={copyReferralLink} className="cursor-pointer">
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy and open in new tab
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <Button variant="outline" size="sm" onClick={openReferralLink} className="px-4 py-2">
+                          <Eye className="h-4 w-4 mr-1" />
+                          Preview Page
                         </Button>
                       </div>
+
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 leading-relaxed">
+                        Share this link with people you'd vouch for. They'll submit their info, and show up in your dashboard.
+                      </p>
                     </div>
 
                     {editing && (
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="username">Username</Label>
-                          <div className="flex gap-2">
+                          <Label htmlFor="username" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Username
+                          </Label>
+                          <div className="flex gap-2 mt-1">
                             <Input
                               id="username"
                               value={referralLinkData.username}
@@ -381,18 +458,21 @@ export default function Profile() {
                             </Button>
                           </div>
                           <p className="text-xs text-gray-500 mt-1">
-                            This will be your unique referral link: refery.io/r/{referralLinkData.username || 'username'}
+                            This will be your unique referral link: https://refery.io/r/{referralLinkData.username || 'username'}
                           </p>
                         </div>
 
                         <div>
-                          <Label htmlFor="personal_message">Personal Message</Label>
+                          <Label htmlFor="personal_message" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Personal Message
+                          </Label>
                           <Textarea
                             id="personal_message"
                             value={referralLinkData.personal_message}
                             onChange={(e) => handleReferralLinkChange('personal_message', e.target.value)}
                             placeholder="Write a personal message that candidates will see on your referral page..."
                             rows={3}
+                            className="mt-1"
                           />
                           <p className="text-xs text-gray-500 mt-1">
                             This message will appear on your referral landing page
@@ -402,25 +482,29 @@ export default function Profile() {
                     )}
                   </div>
                 ) : (
-                  <div className="text-center py-6">
-                    <LinkIcon className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
+                  <div className="text-center py-8">
+                    <div className="bg-emerald-100 dark:bg-emerald-900/30 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <LinkIcon className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                    </div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       Create Your Referral Link
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
                       Set up your personalized referral link to start receiving candidate submissions
                     </p>
                     {!editing && (
-                      <Button onClick={() => setEditing(true)} className="bg-emerald-500 hover:bg-emerald-600">
+                      <Button onClick={() => setEditing(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                         <Plus className="h-4 w-4 mr-2" />
                         Set Up Link
                       </Button>
                     )}
                     {editing && (
-                      <div className="space-y-4 text-left">
+                      <div className="space-y-4 text-left max-w-md mx-auto">
                         <div>
-                          <Label htmlFor="username">Choose Username</Label>
-                          <div className="flex gap-2">
+                          <Label htmlFor="username" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Choose Username
+                          </Label>
+                          <div className="flex gap-2 mt-1">
                             <Input
                               id="username"
                               value={referralLinkData.username}
@@ -437,18 +521,21 @@ export default function Profile() {
                             </Button>
                           </div>
                           <p className="text-xs text-gray-500 mt-1">
-                            Your link will be: refery.io/r/{referralLinkData.username || 'username'}
+                            Your link will be: https://refery.io/r/{referralLinkData.username || 'username'}
                           </p>
                         </div>
 
                         <div>
-                          <Label htmlFor="personal_message">Personal Message</Label>
+                          <Label htmlFor="personal_message" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Personal Message
+                          </Label>
                           <Textarea
                             id="personal_message"
                             value={referralLinkData.personal_message}
                             onChange={(e) => handleReferralLinkChange('personal_message', e.target.value)}
                             placeholder="Write a personal message that candidates will see..."
                             rows={3}
+                            className="mt-1"
                           />
                         </div>
                       </div>
