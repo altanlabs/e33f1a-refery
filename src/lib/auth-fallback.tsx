@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Simple fallback auth context
+// Enhanced auth context to match altan-auth interface
 const AuthContext = React.createContext<any>(null);
 
 export const AuthProvider = ({ children, supabase }: { children: React.ReactNode; supabase: any }) => {
@@ -23,12 +23,41 @@ export const AuthProvider = ({ children, supabase }: { children: React.ReactNode
     return () => subscription.unsubscribe();
   }, [supabase]);
 
+  const service = {
+    supabase,
+    signOut: () => supabase.auth.signOut(),
+    signIn: (email: string, password: string) => supabase.auth.signInWithPassword({ email, password }),
+    signUp: (email: string, password: string, name: string, surname: string) => 
+      supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            name,
+            surname,
+            full_name: `${name} ${surname}`
+          }
+        }
+      }),
+    signInWithGoogle: () => supabase.auth.signInWithOAuth({ 
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      }
+    }),
+    getSession: () => supabase.auth.getSession(),
+    getUser: () => supabase.auth.getUser(),
+    onAuthStateChange: (callback: any) => supabase.auth.onAuthStateChange(callback),
+  };
+
   const value = {
     session,
     loading,
-    signOut: () => supabase.auth.signOut(),
-    signIn: (email: string, password: string) => supabase.auth.signInWithPassword({ email, password }),
-    signUp: (email: string, password: string) => supabase.auth.signUp({ email, password }),
+    service,
+    // Legacy compatibility
+    signOut: service.signOut,
+    signIn: service.signIn,
+    signUp: service.signUp,
   };
 
   return (
