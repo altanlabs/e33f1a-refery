@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { JobCard } from '@/components/jobs/JobCard';
 import { JobFilters, JobFiltersState } from '@/components/jobs/JobFilters';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 import { dbHelpers } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -62,7 +62,7 @@ export default function JobBoard() {
     }
   };
 
-  const filteredAndSortedJobs = useMemo(() => {
+  const filteredAndSortedJobs = React.useMemo(() => {
     let filtered = jobs.filter(job => {
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
