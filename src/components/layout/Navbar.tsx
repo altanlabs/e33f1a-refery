@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 import { Logo } from './navbar/Logo';
 import { NavLinks } from './navbar/NavLinks';
 import { MobileMenu } from './navbar/MobileMenu';
@@ -11,12 +11,12 @@ import { useNavigation } from '@/hooks/useNavigation';
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { session, service } = useAuth();
+  const { session, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navItems = useNavigation(session?.user || null);
 
   const handleLogout = async () => {
-    await service.signOut();
+    await signOut();
     navigate('/');
   };
 

@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { dbHelpers } from '@/lib/supabase';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 import { format } from 'date-fns';
 
 export default function Apply() {
@@ -87,6 +87,11 @@ export default function Apply() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!session?.user) {
+      setError('Please log in to apply for this position');
+      return;
+    }
+
     if (!formData.candidateName || !formData.candidateEmail || !formData.coverLetter) {
       setError('Please fill in all required fields');
       return;

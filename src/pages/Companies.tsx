@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 import { dbHelpers } from '@/lib/supabase';
 import { Plus, Building, Globe, Users, Loader2 } from 'lucide-react';
 
@@ -16,8 +16,10 @@ export default function Companies() {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    loadCompanies();
-  }, []);
+    if (session?.user?.id) {
+      loadCompanies();
+    }
+  }, [session?.user?.id]);
 
   const loadCompanies = async () => {
     try {
