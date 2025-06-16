@@ -301,7 +301,7 @@ export default function App() {
                     </ul>
                     
                     <Button className={`w-full py-3 text-lg font-semibold bg-gradient-to-r ${type.gradient} hover:shadow-xl transform hover:scale-105 transition-all duration-300`} asChild>
-                      <Link to="/auth">
+                      <Link to={type.role === 'referrer' ? '/apply' : '/auth'}>
                         {type.cta}
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
