@@ -22,6 +22,9 @@ import PublicJobDetails from "./pages/PublicJobDetails";
 import ReferralLanding from "./pages/ReferralLanding";
 import ScoutApplication from "./pages/ScoutApplication";
 import ScoutApplicationsAdmin from "./pages/ScoutApplicationsAdmin";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component using stable custom auth
@@ -51,6 +54,18 @@ const routes = [
       {
         path: "apply",
         element: <ScoutApplication />,
+      },
+      {
+        path: "privacy",
+        element: <Privacy />,
+      },
+      {
+        path: "terms",
+        element: <Terms />,
+      },
+      {
+        path: "contact",
+        element: <Contact />,
       },
       {
         path: "admin/scout-applications",
