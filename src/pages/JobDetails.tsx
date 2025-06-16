@@ -3,29 +3,37 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowLeft, 
   MapPin, 
-  DollarSign, 
   Building, 
+  Calendar, 
+  DollarSign, 
+  Users, 
   Clock,
-  Users,
-  Calendar,
-  Edit,
-  Trash2,
-  Eye,
+  Briefcase,
   CheckCircle,
   XCircle,
   AlertCircle,
-  Loader2,
   ExternalLink,
   Share2,
-  Bookmark
+  Edit,
+  Trash2,
+  Plus,
+  Eye,
+  Send,
+  UserPlus,
+  Loader2,
+  Star,
+  TrendingUp,
+  Target,
+  Award
 } from 'lucide-react';
+import { useAuth } from '@/lib/auth-fallback';
 import { dbHelpers } from '@/lib/supabase';
-import { useAuth } from 'altan-auth';
 import { format } from 'date-fns';
 
 export default function JobDetails() {
@@ -412,7 +420,7 @@ export default function JobDetails() {
               )}
               
               <Button variant="outline" className="w-full" onClick={handleSaveJob}>
-                <Bookmark className={`h-4 w-4 mr-2 ${saved ? 'fill-current' : ''}`} />
+                <Star className={`h-4 w-4 mr-2 ${saved ? 'fill-current' : ''}`} />
                 {saved ? 'Saved' : 'Save Job'}
               </Button>
               
