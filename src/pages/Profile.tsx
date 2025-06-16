@@ -4,35 +4,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   User, 
   Mail, 
   Phone, 
   MapPin, 
+  Globe, 
   Briefcase, 
-  Calendar,
-  Upload,
-  Save,
+  GraduationCap,
+  Award,
+  Settings as SettingsIcon,
   Edit,
-  CheckCircle,
-  Loader2,
-  AlertCircle,
-  Camera,
-  Link as LinkIcon,
+  Save,
   Copy,
   Share2,
   ExternalLink,
+  CheckCircle,
+  AlertCircle,
   Plus,
-  Twitter,
-  Linkedin,
   Eye,
-  ChevronDown
+  EyeOff,
+  Loader2,
+  Upload,
+  Camera,
+  Link as LinkIcon,
+  Users,
+  Star,
+  TrendingUp
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -400,30 +403,14 @@ export default function Profile() {
 
                       {/* Share Buttons */}
                       <div className="flex items-center gap-3">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="px-4 py-2">
-                              <Share2 className="h-4 w-4 mr-1" />
-                              Share
-                              <ChevronDown className="h-3 w-3 ml-1" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-48">
-                            <DropdownMenuItem onClick={shareOnTwitter} className="cursor-pointer">
-                              <Twitter className="h-4 w-4 mr-2 text-blue-500" />
-                              Share on Twitter
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={shareOnLinkedIn} className="cursor-pointer">
-                              <Linkedin className="h-4 w-4 mr-2 text-blue-600" />
-                              Share on LinkedIn
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={copyReferralLink} className="cursor-pointer">
-                              <Copy className="h-4 w-4 mr-2" />
-                              Copy and open in new tab
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-
+                        <Button variant="outline" size="sm" onClick={shareOnTwitter} className="px-4 py-2">
+                          <Twitter className="h-4 w-4 mr-1 text-blue-500" />
+                          Share on Twitter
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={shareOnLinkedIn} className="px-4 py-2">
+                          <Linkedin className="h-4 w-4 mr-1 text-blue-600" />
+                          Share on LinkedIn
+                        </Button>
                         <Button variant="outline" size="sm" onClick={openReferralLink} className="px-4 py-2">
                           <Eye className="h-4 w-4 mr-1" />
                           Preview Page
@@ -648,22 +635,13 @@ export default function Profile() {
               
               <div>
                 <Label htmlFor="experience">Experience Level</Label>
-                <Select 
-                  value={profileData.experience} 
-                  onValueChange={(value) => handleInputChange('experience', value)}
+                <Input
+                  id="experience"
+                  value={profileData.experience}
+                  onChange={(e) => handleInputChange('experience', e.target.value)}
+                  placeholder="Select experience level"
                   disabled={!editing}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select experience level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="entry">Entry Level (0-2 years)</SelectItem>
-                    <SelectItem value="mid">Mid Level (3-5 years)</SelectItem>
-                    <SelectItem value="senior">Senior Level (6-10 years)</SelectItem>
-                    <SelectItem value="lead">Lead/Principal (10+ years)</SelectItem>
-                    <SelectItem value="executive">Executive</SelectItem>
-                  </SelectContent>
-                </Select>
+                />
               </div>
               
               <div>
