@@ -1,36 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Settings as SettingsIcon, 
-  Bell, 
-  Shield, 
-  CreditCard, 
-  Moon, 
-  Sun, 
-  Globe,
-  Mail,
-  Smartphone,
-  Eye,
-  Lock,
-  Trash2,
-  Save,
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Globe, 
+  Briefcase, 
+  GraduationCap,
+  Award,
+  Settings as SettingsIcon,
+  Bell,
+  Shield,
+  CreditCard,
+  Users,
+  Building,
+  Target,
   CheckCircle,
   AlertCircle,
-  Loader2,
-  Users,
-  Briefcase,
-  UserCheck,
-  Crown,
-  Sparkles
+  Save,
+  Upload,
+  Edit,
+  Trash2,
+  Plus,
+  Star,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  Clock,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 
 export default function Settings() {
   const { session, service } = useAuth();
