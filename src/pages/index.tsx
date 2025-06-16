@@ -20,7 +20,7 @@ import {
   Rocket
 } from 'lucide-react';
 
-export default function App() {
+export default function Index() {
   const features = [
     {
       icon: Target,
@@ -333,7 +333,7 @@ export default function App() {
                 <CardContent className="p-8">
                   <div className="flex justify-center mb-6">
                     {[...Array(5)].map((_, i) => (
-                      <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
                   <blockquote className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
