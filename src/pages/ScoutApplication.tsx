@@ -377,7 +377,7 @@ const ScoutApplication: React.FC = () => {
               <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-2xl mb-6 mx-auto">
                 <TrendingUp className="w-8 h-8 text-purple-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2 text-center">95%</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2 text-center">5x</div>
               <div className="text-gray-600 text-center">Hire success rate</div>
             </div>
           </div>
