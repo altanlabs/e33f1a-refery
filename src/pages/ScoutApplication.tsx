@@ -172,7 +172,7 @@ const ScoutApplication: React.FC = () => {
         cv_upload: cvUrl || null,
         referral_example: JSON.stringify(formData.referral_profiles),
         trust_agreement: formData.trust_agreement,
-        status: 'pending_review',
+        status: 'pending',
         utm_source: formData.utm_source || null,
         utm_medium: formData.utm_medium || null,
         utm_campaign: formData.utm_campaign || null,
@@ -336,7 +336,7 @@ const ScoutApplication: React.FC = () => {
               Top 1% become Vetted Scouts — get featured and earn faster.
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Become a Vetted<br />
               <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
                 Refery Scout
