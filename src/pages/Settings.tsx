@@ -41,7 +41,11 @@ import {
   Eye,
   EyeOff,
   Lock,
-  Unlock
+  Unlock,
+  Crown,
+  Sparkles,
+  UserCheck,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-fallback';
 
@@ -309,7 +313,7 @@ export default function Settings() {
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Switch Role
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
                     Change your role to access different features and capabilities. You can switch between roles at any time.
                   </p>
                   
