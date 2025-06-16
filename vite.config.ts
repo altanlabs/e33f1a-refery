@@ -13,9 +13,13 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    force: true, 
   },
-  optimizeDeps: {
-    force: true, 
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 })
