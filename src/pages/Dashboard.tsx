@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '@/lib/auth-fallback';
 import { dbHelpers } from '@/lib/supabase';
 import { 
   Briefcase, 
@@ -39,7 +39,6 @@ export default function Dashboard() {
       setLoading(true);
       setError('');
 
-      // Get user role from metadata or default to referrer
       const userRole = session.user.user_metadata?.role || 'referrer';
       let calculatedStats = {};
       let activity: any[] = [];
