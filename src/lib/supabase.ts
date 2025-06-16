@@ -273,19 +273,27 @@ export interface Database {
 export const dbHelpers = {
   // Referrals
   async getReferrals() {
-    const { data, error } = await supabase
-      .from('referrals')
-      .select(`
-        *,
-        job:jobs(
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select(`
           *,
-          company:companies(*)
-        )
-      `)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
+          job:jobs(
+            *,
+            company:companies(*)
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching referrals:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getReferrals:', error);
+      return [];
+    }
   },
 
   async createReferral(referral: Database['public']['Tables']['referrals']['Insert']) {
@@ -356,19 +364,27 @@ export const dbHelpers = {
 
   // Applications
   async getApplications() {
-    const { data, error } = await supabase
-      .from('applications')
-      .select(`
-        *,
-        job:jobs(
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .select(`
           *,
-          company:companies(*)
-        )
-      `)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
+          job:jobs(
+            *,
+            company:companies(*)
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching applications:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getApplications:', error);
+      return [];
+    }
   },
 
   async createApplication(application: Database['public']['Tables']['applications']['Insert']) {
@@ -396,16 +412,24 @@ export const dbHelpers = {
 
   // Jobs
   async getJobs() {
-    const { data, error } = await supabase
-      .from('jobs')
-      .select(`
-        *,
-        company:companies(*)
-      `)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select(`
+          *,
+          company:companies(*)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching jobs:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getJobs:', error);
+      return [];
+    }
   },
 
   async createJob(job: Database['public']['Tables']['jobs']['Insert']) {
