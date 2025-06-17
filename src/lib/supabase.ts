@@ -558,6 +558,40 @@ export const dbHelpers = {
     return data;
   },
 
+  async createCompany(company: Database['public']['Tables']['companies']['Insert']) {
+    const { data, error } = await supabase
+      .from('companies')
+      .insert(company)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateCompany(id: string, updates: Database['public']['Tables']['companies']['Update']) {
+    const { data, error } = await supabase
+      .from('companies')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getCompanyById(id: string) {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
   // Candidates
   async getCandidates() {
     const { data, error } = await supabase
