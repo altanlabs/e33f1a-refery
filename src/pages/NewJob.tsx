@@ -72,12 +72,6 @@ export default function NewJob() {
       return;
     }
 
-    const userRole = session.user.user_metadata?.role || 'referrer';
-    if (userRole !== 'poster') {
-      setError('You must be a poster to create jobs');
-      return;
-    }
-
     try {
       setSaving(true);
       setError('');
@@ -108,19 +102,17 @@ export default function NewJob() {
     }
   };
 
-  const userRole = session?.user?.user_metadata?.role || 'referrer';
-
-  if (!session?.user || userRole !== 'poster') {
+  if (!session?.user) {
     return (
       <div className="container mx-auto py-8 px-4 max-w-2xl">
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Access Denied
+              Authentication Required
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              You must be logged in as a poster to create jobs.
+              You must be logged in to create jobs.
             </p>
           </CardContent>
         </Card>

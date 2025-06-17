@@ -99,9 +99,8 @@ export default function EditJob() {
       return;
     }
 
-    const userRole = session.user.user_metadata?.role || 'referrer';
-    if (userRole !== 'poster') {
-      setError('You must be a poster to edit jobs');
+    if (job?.created_by && job.created_by !== session.user.id) {
+      setError('You can only edit jobs that you created');
       return;
     }
 
@@ -132,19 +131,17 @@ export default function EditJob() {
     }
   };
 
-  const userRole = session?.user?.user_metadata?.role || 'referrer';
-
-  if (!session?.user || userRole !== 'poster') {
+  if (!session?.user) {
     return (
-      <div>
+      <div className="container mx-auto py-8 px-4 max-w-2xl">
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Access Denied
+              Authentication Required
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              You must be logged in as a poster to edit jobs.
+              You must be logged in to edit jobs.
             </p>
           </CardContent>
         </Card>
@@ -154,7 +151,7 @@ export default function EditJob() {
 
   if (loading) {
     return (
-      <div>
+      <div className="container mx-auto py-8 px-4 max-w-2xl">
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading job details...</span>
@@ -165,7 +162,7 @@ export default function EditJob() {
 
   if (error && !job) {
     return (
-      <div>
+      <div className="container mx-auto py-8 px-4 max-w-2xl">
         <Card>
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -181,8 +178,29 @@ export default function EditJob() {
     );
   }
 
+  if (job?.created_by && job.created_by !== session.user.id) {
+    return (
+      <div className="container mx-auto py-8 px-4 max-w-2xl">
+        <Card>
+          <CardContent className="p-12 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Access Denied
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              You can only edit jobs that you created.
+            </p>
+            <Button onClick={() => navigate(`/jobs/${jobId}`)} className="mt-4">
+              View Job Details
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="container mx-auto py-8 px-4 max-w-2xl">
       {/* Header */}
       <div className="mb-8">
         <Button variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mb-4">
