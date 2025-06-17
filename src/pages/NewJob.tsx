@@ -17,7 +17,8 @@ import {
   MapPin,
   DollarSign,
   Calendar,
-  Briefcase
+  Briefcase,
+  Globe
 } from 'lucide-react';
 import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
@@ -26,14 +27,14 @@ import toast, { Toaster } from 'react-hot-toast';
 export default function NewJob() {
   const navigate = useNavigate();
   const { session } = useAuth();
-  const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>('');
   
   const [formData, setFormData] = useState({
     title: '',
-    company: '',
+    companyName: '',
+    companyWebsite: '',
     description: '',
     location: '',
     f_type: '',
@@ -42,23 +43,6 @@ export default function NewJob() {
     closing_date: ''
   });
 
-  useEffect(() => {
-    loadCompanies();
-  }, []);
-
-  const loadCompanies = async () => {
-    try {
-      setLoading(true);
-      const data = await dbHelpers.getCompanies();
-      setCompanies(data || []);
-    } catch (err) {
-      console.error('Error loading companies:', err);
-      setError('Failed to load companies. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -66,11 +50,42 @@ export default function NewJob() {
     }));
   };
 
+  const validateForm = () => {
+    if (!formData.title) {
+      setError('Job title is required');
+      return false;
+    }
+    if (!formData.companyName) {
+      setError('Company name is required');
+      return false;
+    }
+    if (!formData.companyWebsite) {
+      setError('Company website is required');
+      return false;
+    }
+    if (!formData.companyWebsite.startsWith('http://') && !formData.companyWebsite.startsWith('https://')) {
+      setError('Company website must be a valid URL (starting with http:// or https://)');
+      return false;
+    }
+    if (!formData.description) {
+      setError('Job description is required');
+      return false;
+    }
+    if (!formData.location) {
+      setError('Location is required');
+      return false;
+    }
+    if (!formData.f_type) {
+      setError('Job type is required');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.company || !formData.description || !formData.location || !formData.f_type) {
-      setError('Please fill in all required fields');
+    if (!validateForm()) {
       return;
     }
 
@@ -83,15 +98,28 @@ export default function NewJob() {
       setSaving(true);
       setError('');
 
+      // First, create or find the company
+      const companyData = {
+        name: formData.companyName.trim(),
+        website: formData.companyWebsite.trim()
+      };
+
+      const company = await dbHelpers.createCompany(companyData);
+      
+      if (!company) {
+        throw new Error('Failed to create company');
+      }
+
+      // Then create the job with the company reference
       const jobData = {
-        title: formData.title,
-        company: formData.company,
-        description: formData.description,
-        location: formData.location,
+        title: formData.title.trim(),
+        company: company.id,
+        description: formData.description.trim(),
+        location: formData.location.trim(),
         f_type: formData.f_type as 'Full-time' | 'Part-time' | 'Contract' | 'Remote',
         status: 'Open' as const,
         reward_amount: formData.reward_amount ? parseInt(formData.reward_amount) : 0,
-        requirements: formData.requirements,
+        requirements: formData.requirements.trim(),
         closing_date: formData.closing_date || undefined
       };
 
@@ -204,28 +232,35 @@ export default function NewJob() {
                   />
                 </div>
 
-                <div className="md:col-span-2">
-                  <Label htmlFor="company" className="text-lg font-semibold text-gray-900 mb-3 block">
+                <div>
+                  <Label htmlFor="companyName" className="text-lg font-semibold text-gray-900 mb-3 block">
                     <Building className="w-5 h-5 inline mr-2 text-blue-500" />
-                    Company *
+                    Company Name *
                   </Label>
-                  <Select value={formData.company} onValueChange={(value) => handleInputChange('company', value)}>
-                    <SelectTrigger className="h-12 text-lg border-gray-200 focus:border-purple-500 bg-white/50 backdrop-blur-sm">
-                      <SelectValue placeholder="Select a company" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {companies.map((company) => (
-                        <SelectItem key={company.id} value={company.id}>
-                          {company.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {companies.length === 0 && !loading && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      No companies found. Please add a company first.
-                    </p>
-                  )}
+                  <Input
+                    id="companyName"
+                    value={formData.companyName}
+                    onChange={(e) => handleInputChange('companyName', e.target.value)}
+                    placeholder="e.g. Acme Corporation"
+                    className="h-12 text-lg border-gray-200 focus:border-purple-500 focus:ring-purple-500 bg-white/50 backdrop-blur-sm"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="companyWebsite" className="text-lg font-semibold text-gray-900 mb-3 block">
+                    <Globe className="w-5 h-5 inline mr-2 text-cyan-500" />
+                    Company Website *
+                  </Label>
+                  <Input
+                    id="companyWebsite"
+                    type="url"
+                    value={formData.companyWebsite}
+                    onChange={(e) => handleInputChange('companyWebsite', e.target.value)}
+                    placeholder="https://www.company.com"
+                    className="h-12 text-lg border-gray-200 focus:border-purple-500 focus:ring-purple-500 bg-white/50 backdrop-blur-sm"
+                    required
+                  />
                 </div>
 
                 <div>
