@@ -23,19 +23,26 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Dashboard() {
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<any>({});
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    console.log('Dashboard useEffect - session:', session, 'authLoading:', authLoading);
+    
+    if (authLoading) {
+      // Still loading auth state
+      return;
+    }
+    
     if (session?.user) {
       loadDashboardData();
-    } else if (session === null) {
+    } else {
       setLoading(false);
     }
-  }, [session]);
+  }, [session, authLoading]);
 
   const loadDashboardData = async () => {
     if (!session?.user) {
@@ -110,18 +117,35 @@ export default function Dashboard() {
     }
   };
 
+  // Show loading while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="mx-auto max-w-7xl py-6 px-4 flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Initializing...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
   if (!session?.user) {
     return (
       <div className="mx-auto max-w-7xl py-6 px-4">
         <Alert>
           <AlertDescription>
             Please log in to view your dashboard.
+            <Button variant="outline" size="sm" className="ml-2" asChild>
+              <Link to="/auth">Sign In</Link>
+            </Button>
           </AlertDescription>
         </Alert>
       </div>
     );
   }
 
+  // Show loading while dashboard data loads
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl py-6 px-4 flex items-center justify-center">
