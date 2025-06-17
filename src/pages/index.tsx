@@ -168,9 +168,9 @@ export default function App() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-4 text-lg font-semibold bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-2 hover:bg-white/80 dark:hover:bg-gray-800/80 transform hover:scale-105 transition-all duration-300" asChild>
-              <Link to="/auth">
-                <Globe className="mr-2 h-5 w-5" />
-                Explore Platform
+              <Link to="/apply">
+                <Award className="mr-2 h-5 w-5" />
+                Become a Vetted Scout
               </Link>
             </Button>
           </div>
@@ -394,9 +394,9 @@ export default function App() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-10 py-4 text-xl font-bold bg-transparent text-white border-2 border-white/50 hover:bg-white/10 backdrop-blur-sm transform hover:scale-110 transition-all duration-300" asChild>
-              <Link to="/auth">
-                <Globe className="mr-3 h-6 w-6" />
-                Explore Platform
+              <Link to="/apply">
+                <Award className="mr-3 h-6 w-6" />
+                Become a Vetted Scout
               </Link>
             </Button>
           </div>
