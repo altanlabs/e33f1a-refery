@@ -102,7 +102,7 @@ export default function Terms() {
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Reward amounts are set by job posters and clearly displayed</li>
                     <li>Payments are processed through Stripe after successful hires</li>
-                    <li>Payouts typically occur within 30 days of hire confirmation</li>
+                    <li>Payouts typically occur within 90 days of hire confirmation</li>
                     <li>Tax responsibilities belong to the reward recipient</li>
                   </ul>
                 </div>
