@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
+  // Updated component for Refery.io landing page
   const features = [
     {
       icon: Target,
