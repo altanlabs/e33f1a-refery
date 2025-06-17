@@ -335,9 +335,9 @@ export interface Database {
 // Helper functions for database operations
 export const dbHelpers = {
   // Referrals
-  async getReferrals() {
+  async getReferrals(userId?: string) {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('referrals')
         .select(`
           *,
@@ -345,8 +345,13 @@ export const dbHelpers = {
             *,
             company:companies(*)
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
+      
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
       
       if (error) {
         console.warn('Error fetching referrals:', error);
@@ -426,9 +431,9 @@ export const dbHelpers = {
   },
 
   // Applications
-  async getApplications() {
+  async getApplications(userId?: string) {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('applications')
         .select(`
           *,
@@ -436,8 +441,13 @@ export const dbHelpers = {
             *,
             company:companies(*)
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
+      
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
       
       if (error) {
         console.warn('Error fetching applications:', error);
@@ -474,15 +484,20 @@ export const dbHelpers = {
   },
 
   // Jobs
-  async getJobs() {
+  async getJobs(userId?: string) {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('jobs')
         .select(`
           *,
           company:companies(*)
-        `)
-        .order('created_at', { ascending: false });
+        `);
+      
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
       
       if (error) {
         console.warn('Error fetching jobs:', error);

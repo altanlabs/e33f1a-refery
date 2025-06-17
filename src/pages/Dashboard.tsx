@@ -42,10 +42,12 @@ export default function Dashboard() {
       setLoading(true);
       setError('');
 
+      const userId = session.user.id;
+
       const [jobs, referrals, applications] = await Promise.all([
-        dbHelpers.getJobs(),
-        dbHelpers.getReferrals(),
-        dbHelpers.getApplications()
+        dbHelpers.getJobs(userId),
+        dbHelpers.getReferrals(userId),
+        dbHelpers.getApplications(userId)
       ]);
 
       const totalEarnings = referrals
