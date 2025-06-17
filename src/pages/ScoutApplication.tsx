@@ -31,7 +31,6 @@ import {
   Info,
   Crown,
   Rocket,
-  Lightning,
   Globe,
   ChevronRight,
   CheckCircle2,
@@ -467,7 +466,7 @@ const ScoutApplication: React.FC = () => {
             <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-xl border border-blue-500/20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:shadow-blue-500/20 transition-all duration-300 group">
               <CardContent className="p-8">
                 <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Lightning className="w-10 h-10 text-white" />
+                  <Zap className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">Fast-Track Process</h3>
                 <p className="text-gray-300 leading-relaxed">
