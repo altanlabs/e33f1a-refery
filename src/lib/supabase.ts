@@ -265,6 +265,69 @@ export interface Database {
           status?: 'Suggested' | 'Applied' | 'Not Interested';
         };
       };
+      scout_applications: {
+        Row: {
+          id: string;
+          full_name: string;
+          email: string;
+          linkedin_url: string;
+          role: 'Founder' | 'Operator' | 'Investor' | 'Other';
+          trust_agreement: boolean;
+          status?: 'pending' | 'approved' | 'declined';
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          full_name: string;
+          email: string;
+          linkedin_url: string;
+          role: 'Founder' | 'Operator' | 'Investor' | 'Other';
+          trust_agreement: boolean;
+          status?: 'pending' | 'approved' | 'declined';
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+        };
+        Update: {
+          full_name?: string;
+          email?: string;
+          linkedin_url?: string;
+          role?: 'Founder' | 'Operator' | 'Investor' | 'Other';
+          trust_agreement?: boolean;
+          status?: 'pending' | 'approved' | 'declined';
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+        };
+      };
+      scout_referral_profiles: {
+        Row: {
+          id: string;
+          linkedin_url: string;
+          relationship: string;
+          suggested_role: string;
+          why_great: string;
+          application_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          linkedin_url: string;
+          relationship: string;
+          suggested_role: string;
+          why_great: string;
+          application_id: string;
+        };
+        Update: {
+          linkedin_url?: string;
+          relationship?: string;
+          suggested_role?: string;
+          why_great?: string;
+        };
+      };
     };
   };
 }
@@ -679,5 +742,187 @@ export const dbHelpers = {
     }
 
     return data?.slice(0, 3) || [];
+  },
+
+  // Scout Applications
+  async getScoutApplications() {
+    try {
+      const { data, error } = await supabase
+        .from('scout_applications')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching scout applications:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getScoutApplications:', error);
+      return [];
+    }
+  },
+
+  async createScoutApplication(application: {
+    full_name: string;
+    email: string;
+    linkedin_url: string;
+    role: 'Founder' | 'Operator' | 'Investor' | 'Other';
+    trust_agreement: boolean;
+    status?: 'pending' | 'approved' | 'declined';
+    utm_source?: string | null;
+    utm_medium?: string | null;
+    utm_campaign?: string | null;
+  }) {
+    const { data, error } = await supabase
+      .from('scout_applications')
+      .insert({
+        ...application,
+        status: application.status || 'pending'
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateScoutApplication(id: string, updates: {
+    full_name?: string;
+    email?: string;
+    linkedin_url?: string;
+    role?: 'Founder' | 'Operator' | 'Investor' | 'Other';
+    trust_agreement?: boolean;
+    status?: 'pending' | 'approved' | 'declined';
+    utm_source?: string | null;
+    utm_medium?: string | null;
+    utm_campaign?: string | null;
+  }) {
+    const { data, error } = await supabase
+      .from('scout_applications')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getScoutApplicationById(id: string) {
+    try {
+      const { data, error } = await supabase
+        .from('scout_applications')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        console.warn('Error fetching scout application:', error);
+        return null;
+      }
+      return data;
+    } catch (error) {
+      console.warn('Error in getScoutApplicationById:', error);
+      return null;
+    }
+  },
+
+  // Scout Referral Profiles
+  async getScoutReferralProfiles() {
+    try {
+      const { data, error } = await supabase
+        .from('scout_referral_profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching scout referral profiles:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getScoutReferralProfiles:', error);
+      return [];
+    }
+  },
+
+  async getScoutReferralProfilesByApplication(applicationId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('scout_referral_profiles')
+        .select('*')
+        .eq('application_id', applicationId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching scout referral profiles by application:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getScoutReferralProfilesByApplication:', error);
+      return [];
+    }
+  },
+
+  async createScoutReferralProfile(profile: {
+    linkedin_url: string;
+    relationship: string;
+    suggested_role: string;
+    why_great: string;
+    application_id: string;
+  }) {
+    const { data, error } = await supabase
+      .from('scout_referral_profiles')
+      .insert(profile)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async createScoutReferralProfiles(profiles: {
+    linkedin_url: string;
+    relationship: string;
+    suggested_role: string;
+    why_great: string;
+    application_id: string;
+  }[]) {
+    const { data, error } = await supabase
+      .from('scout_referral_profiles')
+      .insert(profiles)
+      .select();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async updateScoutReferralProfile(id: string, updates: {
+    linkedin_url?: string;
+    relationship?: string;
+    suggested_role?: string;
+    why_great?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('scout_referral_profiles')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteScoutReferralProfile(id: string) {
+    const { error } = await supabase
+      .from('scout_referral_profiles')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+    return true;
   }
 };

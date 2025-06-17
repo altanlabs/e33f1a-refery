@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileUpload } from '@/components/ui/FileUpload';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/lib/supabase';
 import { 
@@ -28,16 +27,17 @@ import {
   ArrowLeft,
   Shield,
   Target,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReferralProfile {
   id: string;
-  linkedinUrl: string;
+  linkedin_url: string;
   relationship: string;
-  role: string;
-  reason: string;
+  suggested_role: string;
+  why_great: string;
 }
 
 interface ScoutApplicationData {
@@ -45,7 +45,6 @@ interface ScoutApplicationData {
   email: string;
   linkedin_url: string;
   role: 'Founder' | 'Operator' | 'Investor' | 'Other';
-  cv_upload?: string;
   referral_profiles: ReferralProfile[];
   trust_agreement: boolean;
   utm_source?: string;
@@ -65,7 +64,7 @@ const ScoutApplication: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Extract UTM parameters from URL
@@ -83,18 +82,14 @@ const ScoutApplication: React.FC = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = (file: File) => {
-    setCvFile(file);
-  };
-
   const addReferralProfile = () => {
     if (formData.referral_profiles.length < 5) {
       const newProfile: ReferralProfile = {
         id: Date.now().toString(),
-        linkedinUrl: '',
+        linkedin_url: '',
         relationship: '',
-        role: '',
-        reason: ''
+        suggested_role: '',
+        why_great: ''
       };
       handleInputChange('referral_profiles', [...formData.referral_profiles, newProfile]);
     }
@@ -112,40 +107,6 @@ const ScoutApplication: React.FC = () => {
     handleInputChange('referral_profiles', updatedProfiles);
   };
 
-  const uploadFile = async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    
-    const base64 = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(',')[1]);
-      };
-      reader.readAsDataURL(file);
-    });
-
-    const response = await fetch('https://database.altan.ai/storage/v1/upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'tenant_da5b0993_a4a7_497e_bdec_1237e9439761',
-      },
-      body: JSON.stringify({
-        file_content: base64,
-        mime_type: file.type,
-        file_name: fileName,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload file');
-    }
-
-    const data = await response.json();
-    return data.media_url;
-  };
-
   const handleSubmit = async () => {
     if (!formData.trust_agreement) {
       toast({
@@ -159,18 +120,12 @@ const ScoutApplication: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      let cvUrl = '';
-      if (cvFile) {
-        cvUrl = await uploadFile(cvFile);
-      }
-
+      // Step 1: Create scout application
       const applicationData = {
         full_name: formData.full_name,
         email: formData.email,
         linkedin_url: formData.linkedin_url,
         role: formData.role,
-        cv_upload: cvUrl || null,
-        referral_example: JSON.stringify(formData.referral_profiles),
         trust_agreement: formData.trust_agreement,
         status: 'pending',
         utm_source: formData.utm_source || null,
@@ -178,12 +133,36 @@ const ScoutApplication: React.FC = () => {
         utm_campaign: formData.utm_campaign || null,
       };
 
-      const { error } = await supabase
+      const { data: applicationResult, error: applicationError } = await supabase
         .from('scout_applications')
-        .insert([applicationData]);
+        .insert([applicationData])
+        .select()
+        .single();
 
-      if (error) {
-        throw error;
+      if (applicationError) {
+        throw applicationError;
+      }
+
+      const createdApplicationId = applicationResult.id;
+      setApplicationId(createdApplicationId);
+
+      // Step 2: Create individual referral profiles
+      if (formData.referral_profiles.length > 0) {
+        const referralProfilesData = formData.referral_profiles.map(profile => ({
+          linkedin_url: profile.linkedin_url,
+          relationship: profile.relationship,
+          suggested_role: profile.suggested_role,
+          why_great: profile.why_great,
+          application_id: createdApplicationId,
+        }));
+
+        const { error: referralError } = await supabase
+          .from('scout_referral_profiles')
+          .insert(referralProfilesData);
+
+        if (referralError) {
+          throw referralError;
+        }
       }
 
       setIsSubmitted(true);
@@ -203,12 +182,47 @@ const ScoutApplication: React.FC = () => {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep === 1) {
       if (!formData.full_name || !formData.email || !formData.linkedin_url) {
         toast({
           title: "Required Fields",
           description: "Please fill in all required fields before continuing.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create the scout application record when moving to step 2
+      try {
+        const applicationData = {
+          full_name: formData.full_name,
+          email: formData.email,
+          linkedin_url: formData.linkedin_url,
+          role: formData.role,
+          trust_agreement: false, // Will be updated in final submission
+          status: 'pending',
+          utm_source: formData.utm_source || null,
+          utm_medium: formData.utm_medium || null,
+          utm_campaign: formData.utm_campaign || null,
+        };
+
+        const { data: applicationResult, error: applicationError } = await supabase
+          .from('scout_applications')
+          .insert([applicationData])
+          .select()
+          .single();
+
+        if (applicationError) {
+          throw applicationError;
+        }
+
+        setApplicationId(applicationResult.id);
+      } catch (error) {
+        console.error('Error creating application:', error);
+        toast({
+          title: "Error",
+          description: "There was an error saving your information. Please try again.",
           variant: "destructive",
         });
         return;
@@ -519,21 +533,6 @@ const ScoutApplication: React.FC = () => {
                       ))}
                     </RadioGroup>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
-                      Upload CV or Proof of Track Record (Optional)
-                    </Label>
-                    <FileUpload
-                      onFileSelect={handleFileUpload}
-                      accept=".pdf,.doc,.docx"
-                      maxSize={5 * 1024 * 1024}
-                      className="border-gray-200 hover:border-emerald-300 rounded-xl"
-                    />
-                    <p className="text-xs text-gray-500">
-                      PDF, DOC, or DOCX files up to 5MB
-                    </p>
-                  </div>
                 </div>
               )}
 
@@ -541,10 +540,14 @@ const ScoutApplication: React.FC = () => {
                 <div className="space-y-6">
                   <div className="text-center mb-8">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Who Would You Refer?</h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 mb-4">
                       Add up to 5 profiles of people you'd recommend for great opportunities
                     </p>
-                    <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium mt-2">
+                    <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                      <Info className="w-3 h-3" />
+                      You can add up to 5 people. The more detailed, the better your chances of getting accepted.
+                    </div>
+                    <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium mt-2">
                       <Shield className="w-3 h-3" />
                       You don't need to tell them yet — we only contact them if you're accepted.
                     </div>
@@ -554,7 +557,7 @@ const ScoutApplication: React.FC = () => {
                     <Card key={profile.id} className="border border-gray-200 rounded-xl">
                       <CardHeader className="pb-4">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">Referral #{index + 1}</CardTitle>
+                          <CardTitle className="text-lg">Referral {index + 1} of 5</CardTitle>
                           <Button
                             type="button"
                             variant="ghost"
@@ -570,8 +573,8 @@ const ScoutApplication: React.FC = () => {
                         <div className="space-y-2">
                           <Label className="text-sm font-medium text-gray-700">LinkedIn URL</Label>
                           <Input
-                            value={profile.linkedinUrl}
-                            onChange={(e) => updateReferralProfile(profile.id, 'linkedinUrl', e.target.value)}
+                            value={profile.linkedin_url}
+                            onChange={(e) => updateReferralProfile(profile.id, 'linkedin_url', e.target.value)}
                             placeholder="https://linkedin.com/in/theirprofile"
                             className="h-10 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg"
                           />
@@ -590,8 +593,8 @@ const ScoutApplication: React.FC = () => {
                         <div className="space-y-2">
                           <Label className="text-sm font-medium text-gray-700">What role do you think they'd thrive in?</Label>
                           <Input
-                            value={profile.role}
-                            onChange={(e) => updateReferralProfile(profile.id, 'role', e.target.value)}
+                            value={profile.suggested_role}
+                            onChange={(e) => updateReferralProfile(profile.id, 'suggested_role', e.target.value)}
                             placeholder="Software Engineer, Product Manager, Designer..."
                             className="h-10 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg"
                           />
@@ -600,8 +603,8 @@ const ScoutApplication: React.FC = () => {
                         <div className="space-y-2">
                           <Label className="text-sm font-medium text-gray-700">Why are they a great hire?</Label>
                           <Textarea
-                            value={profile.reason}
-                            onChange={(e) => updateReferralProfile(profile.id, 'reason', e.target.value)}
+                            value={profile.why_great}
+                            onChange={(e) => updateReferralProfile(profile.id, 'why_great', e.target.value)}
                             placeholder="What makes them special? Their skills, achievements, work ethic..."
                             rows={3}
                             className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg resize-none"
