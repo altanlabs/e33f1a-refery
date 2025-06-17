@@ -356,18 +356,6 @@ export default function NewJob() {
             </form>
           </CardContent>
         </Card>
-
-        {/* Trusted Companies */}
-        <div className="mt-12 text-center">
-          <p className="text-gray-500 mb-6">Trusted by 2,500+ companies</p>
-          <div className="flex justify-center items-center space-x-8 opacity-40">
-            {['Google', 'Meta', 'Apple', 'Netflix', 'Uber'].map((company) => (
-              <div key={company} className="text-xl font-bold text-gray-400">
-                {company}
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <Toaster 
