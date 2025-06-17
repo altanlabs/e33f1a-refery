@@ -273,81 +273,67 @@ const ScoutApplication: React.FC = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      <div className="min-h-screen bg-white">
         {/* Animated Background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
-
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 py-16">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full mb-8 shadow-2xl shadow-emerald-500/25">
-              <CheckCircle className="w-12 h-12 text-white" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-6">
+              <CheckCircle className="w-10 h-10 text-emerald-600" />
             </div>
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-2 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
-              <Crown className="w-4 h-4" />
-              Elite Scout Application Received
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-emerald-200 to-white bg-clip-text text-transparent mb-6 leading-tight">
-              Welcome to the<br />
-              <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
-                Refery Elite Network
-              </span>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              You're one step away from joining the Refery Scout Network.
             </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Your application is under review by our elite team. If accepted, you'll unlock access to refer trusted talent and earn up to <span className="text-emerald-400 font-semibold">$15,000 per hire</span>.
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              We're reviewing your application. If accepted, you'll unlock access to refer trusted talent and earn up to $15,000 per hire.
             </p>
           </div>
 
-          <Card className="backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
-            <CardHeader className="text-center border-b border-white/10 bg-gradient-to-r from-emerald-500/10 to-blue-500/10">
-              <CardTitle className="text-2xl text-white flex items-center gap-2">
-                <Share2 className="w-6 h-6 text-emerald-400" />
-                Spread the Elite Opportunity
-              </CardTitle>
-              <CardDescription className="text-gray-300">
-                Invite another elite operator or founder to join the network
+          <Card className="backdrop-blur-sm bg-white/90 border border-gray-200 shadow-xl rounded-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl text-gray-900">Share the Opportunity</CardTitle>
+              <CardDescription className="text-gray-600">
+                Invite another operator or founder to apply
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-8">
+            <CardContent>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   onClick={shareOnTwitter}
                   variant="outline"
-                  className="flex items-center gap-3 bg-blue-500/10 border-blue-500/20 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/40 rounded-xl h-12 backdrop-blur-sm transition-all duration-300"
+                  className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-200 rounded-xl"
                 >
-                  <Twitter className="w-5 h-5" />
+                  <Twitter className="w-4 h-4" />
                   Share on Twitter
                 </Button>
                 <Button
                   onClick={shareOnLinkedIn}
                   variant="outline"
-                  className="flex items-center gap-3 bg-blue-600/10 border-blue-600/20 text-blue-300 hover:bg-blue-600/20 hover:border-blue-500/40 rounded-xl h-12 backdrop-blur-sm transition-all duration-300"
+                  className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-200 rounded-xl"
                 >
-                  <Linkedin className="w-5 h-5" />
+                  <Linkedin className="w-4 h-4" />
                   Share on LinkedIn
                 </Button>
                 <Button
                   onClick={copyToClipboard}
                   variant="outline"
-                  className="flex items-center gap-3 bg-gray-500/10 border-gray-500/20 text-gray-300 hover:bg-gray-500/20 hover:border-gray-400/40 rounded-xl h-12 backdrop-blur-sm transition-all duration-300"
+                  className="flex items-center gap-2 hover:bg-gray-50 hover:border-gray-200 rounded-xl"
                 >
-                  <Copy className="w-5 h-5" />
-                  Copy Elite Link
+                  <Copy className="w-4 h-4" />
+                  Copy referral link
                 </Button>
               </div>
             </CardContent>
           </Card>
 
           <div className="text-center mt-12">
-            <p className="text-gray-400">
-              Elite Support:{' '}
-              <a href="mailto:scouts@refery.io" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+            <p className="text-gray-500">
+              Questions? Email us at{' '}
+              <a href="mailto:scouts@refery.io" className="text-emerald-600 hover:text-emerald-700 font-medium">
                 scouts@refery.io
               </a>
             </p>
@@ -358,131 +344,114 @@ const ScoutApplication: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 font-['Inter',sans-serif] relative overflow-hidden">
+    <div className="min-h-screen bg-white font-['Inter',sans-serif]">
       {/* Animated Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-400/5 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
-
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
 
       <div className="relative z-10">
         {/* Hero Section */}
         <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 text-emerald-300 px-6 py-3 rounded-full text-sm font-medium mb-8 backdrop-blur-sm">
-              <Crown className="w-4 h-4" />
-              Elite 1% Network — Premium Rewards & Recognition
-              <Sparkles className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Star className="w-4 h-4" />
+              Top 1% become Vetted Scouts — get featured and earn faster.
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
-              <span className="bg-gradient-to-r from-white via-emerald-200 to-white bg-clip-text text-transparent">
-                Become an
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Elite Scout
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+              Become a Vetted<br />
+              <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                Refery Scout
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              Join the most exclusive talent network. Refer elite professionals. 
-              <br />
-              <span className="text-emerald-400 font-semibold">Earn up to $15,000 per hire.</span> 
-              <span className="text-blue-400 font-semibold"> Get featured by top startups.</span>
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Refer trusted talent. Earn rewards up to $15,000. Be seen by top startups.
             </p>
 
             <Button 
               onClick={scrollToForm}
               size="lg"
-              className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white px-12 py-6 text-xl font-bold rounded-2xl shadow-2xl shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-300 transform hover:scale-105"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
-              <Rocket className="w-6 h-6 mr-3" />
-              Join Elite Network
-              <ChevronRight className="w-6 h-6 ml-3" />
+              Apply Now
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-8 shadow-2xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all duration-300 group">
-              <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <DollarSign className="w-10 h-10 text-white" />
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <div className="flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-2xl mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <DollarSign className="w-8 h-8 text-emerald-600" />
               </div>
-              <div className="text-4xl font-bold text-white mb-2 text-center">$15,000</div>
-              <div className="text-emerald-300 text-center font-medium">Maximum Elite Reward</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2 text-center">$15,000</div>
+              <div className="text-gray-600 text-center">Maximum reward per hire</div>
             </div>
-            <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-xl border border-blue-500/20 rounded-3xl p-8 shadow-2xl shadow-blue-500/10 hover:shadow-blue-500/20 transition-all duration-300 group">
-              <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Users className="w-10 h-10 text-white" />
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-8 h-8 text-blue-600" />
               </div>
-              <div className="text-4xl font-bold text-white mb-2 text-center">500+</div>
-              <div className="text-blue-300 text-center font-medium">Elite Scouts Active</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2 text-center">500+</div>
+              <div className="text-gray-600 text-center">Active scouts in network</div>
             </div>
-            <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-xl border border-purple-500/20 rounded-3xl p-8 shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 group">
-              <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl mb-6 mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <TrendingUpIcon className="w-10 h-10 text-white" />
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <div className="flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-2xl mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="w-8 h-8 text-emerald-600" />
               </div>
-              <div className="text-4xl font-bold text-white mb-2 text-center">95%</div>
-              <div className="text-purple-300 text-center font-medium">Elite Success Rate</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2 text-center">95%</div>
+              <div className="text-gray-600 text-center">Hire success rate</div>
             </div>
           </div>
         </section>
 
-        {/* Elite Advantages */}
-        <section className="mx-auto max-w-7xl px-4 py-16">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                The Elite
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
-                Scout Advantage
-              </span>
+        {/* Why Become a Scout - Trust Panel */}
+        <section className="mx-auto max-w-7xl px-4 py-16 bg-gradient-to-r from-gray-50 to-emerald-50/30">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              The Vetted Scout Advantage
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Join an exclusive network where quality matters and elite performance drives exceptional results
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Join an exclusive network where quality matters and trust drives results
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 backdrop-blur-xl border border-emerald-500/20 rounded-3xl overflow-hidden shadow-2xl shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all duration-300 group">
+            <Card className="bg-white border-0 shadow-xl rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
               <CardContent className="p-8">
-                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Eye className="w-10 h-10 text-white" />
+                <div className="flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Eye className="w-8 h-8 text-emerald-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Premium Visibility</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Your elite profile gets featured placement and priority visibility when top companies seek talent referrers.
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Highlighted to Hiring Managers</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Your profile gets premium placement and visibility when companies are looking for talent referrers.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 backdrop-blur-xl border border-blue-500/20 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 hover:shadow-blue-500/20 transition-all duration-300 group">
+            <Card className="bg-white border-0 shadow-xl rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
               <CardContent className="p-8">
-                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Zap className="w-10 h-10 text-white" />
+                <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Zap className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Fast-Track Process</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Your elite referrals bypass standard queues with dedicated support and accelerated hiring processes.
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Top Referrals Get Priority</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Your referrals are fast-tracked through the hiring process with dedicated support and attention.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 backdrop-blur-xl border border-purple-500/20 rounded-3xl overflow-hidden shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 group">
+            <Card className="bg-white border-0 shadow-xl rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 group">
               <CardContent className="p-8">
-                <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Diamond className="w-10 h-10 text-white" />
+                <div className="flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Target className="w-8 h-8 text-emerald-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Elite Tier Rewards</h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Higher success rates unlock premium reward tiers and exclusive access to high-value opportunities.
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Better Conversion = Better Payouts</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Higher success rates unlock premium reward tiers and exclusive high-value opportunities.
                 </p>
               </CardContent>
             </Card>
@@ -490,44 +459,39 @@ const ScoutApplication: React.FC = () => {
         </section>
 
         {/* Application Form */}
-        <section id="application-form" className="mx-auto max-w-5xl px-4 py-16">
-          <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-emerald-500/20 via-blue-500/20 to-purple-500/20 border-b border-white/10 p-8">
+        <section id="application-form" className="mx-auto max-w-4xl px-4 py-16">
+          <Card className="bg-white border border-gray-200 shadow-2xl rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-blue-50 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-3xl text-white flex items-center gap-3">
-                    <Crown className="w-8 h-8 text-emerald-400" />
-                    Elite Scout Application
+                  <CardTitle className="text-2xl text-gray-900 flex items-center gap-2">
+                    <Sparkles className="w-6 h-6 text-emerald-600" />
+                    Scout Application
                   </CardTitle>
-                  <CardDescription className="text-gray-300 mt-3 text-lg">
-                    Step {currentStep} of 2 - {currentStep === 1 ? 'Elite Profile' : 'Your Elite Network'}
+                  <CardDescription className="text-gray-600 mt-2">
+                    Step {currentStep} of 2 - {currentStep === 1 ? 'About You' : 'Who Would You Refer?'}
                   </CardDescription>
                 </div>
-                <div className="flex items-center gap-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 px-4 py-2 rounded-full backdrop-blur-sm">
-                  <Sparkles className="w-5 h-5 text-emerald-400" />
-                  <span className="text-sm font-medium text-emerald-300">Elite Access</span>
+                <div className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-emerald-600" />
+                  <span className="text-sm font-medium text-emerald-600">Premium Application</span>
                 </div>
               </div>
-              <div className="mt-6">
-                <Progress 
-                  value={(currentStep / 2) * 100} 
-                  className="h-3 bg-white/10 rounded-full overflow-hidden"
-                />
-              </div>
+              <Progress value={(currentStep / 2) * 100} className="mt-4" />
             </CardHeader>
 
             <CardContent className="p-8">
               {currentStep === 1 && (
-                <div className="space-y-8">
+                <div className="space-y-6">
                   <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-white mb-3">Tell us about yourself</h3>
-                    <p className="text-gray-300">We're building an elite network of the most trusted talent connectors</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Tell us about yourself</h3>
+                    <p className="text-gray-600">We're building an elite network of the most trusted talent connectors</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <Label htmlFor="full_name" className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <UserCheck className="w-4 h-4 text-emerald-400" />
+                    <div className="space-y-2">
+                      <Label htmlFor="full_name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <UserCheck className="w-4 h-4 text-emerald-600" />
                         Full Name *
                       </Label>
                       <Input
@@ -536,14 +500,14 @@ const ScoutApplication: React.FC = () => {
                         value={formData.full_name}
                         onChange={(e) => handleInputChange('full_name', e.target.value)}
                         required
-                        className="h-14 bg-white/5 border-white/20 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm"
+                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
                         placeholder="Enter your full name"
                       />
                     </div>
 
-                    <div className="space-y-3">
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-blue-400" />
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-blue-600" />
                         Email Address *
                       </Label>
                       <Input
@@ -552,16 +516,16 @@ const ScoutApplication: React.FC = () => {
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         required
-                        className="h-14 bg-white/5 border-white/20 focus:border-blue-400 focus:ring-blue-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm"
+                        className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                         placeholder="your@email.com"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <Label htmlFor="linkedin_url" className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Linkedin className="w-4 h-4 text-blue-400" />
-                      LinkedIn Profile *
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedin_url" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Linkedin className="w-4 h-4 text-blue-600" />
+                      LinkedIn URL *
                     </Label>
                     <Input
                       id="linkedin_url"
@@ -569,14 +533,14 @@ const ScoutApplication: React.FC = () => {
                       value={formData.linkedin_url}
                       onChange={(e) => handleInputChange('linkedin_url', e.target.value)}
                       required
-                      className="h-14 bg-white/5 border-white/20 focus:border-blue-400 focus:ring-blue-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm"
+                      className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                       placeholder="https://linkedin.com/in/yourprofile"
                     />
                   </div>
 
-                  <div className="space-y-4">
-                    <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-purple-400" />
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-emerald-600" />
                       Your Role *
                     </Label>
                     <RadioGroup
@@ -587,24 +551,24 @@ const ScoutApplication: React.FC = () => {
                       {[
                         { value: 'Founder', icon: Rocket, color: 'emerald' },
                         { value: 'Operator', icon: Building2, color: 'blue' },
-                        { value: 'Investor', icon: TrendingUpIcon, color: 'purple' },
+                        { value: 'Investor', icon: TrendingUpIcon, color: 'emerald' },
                         { value: 'Other', icon: Star, color: 'gray' }
                       ].map((role) => (
                         <div key={role.value} className="relative">
                           <RadioGroupItem value={role.value} id={role.value} className="sr-only" />
                           <Label 
                             htmlFor={role.value} 
-                            className={`flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                            className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
                               formData.role === role.value 
-                                ? `border-${role.color}-400 bg-${role.color}-500/20 shadow-lg shadow-${role.color}-500/25` 
-                                : 'border-white/20 bg-white/5 hover:border-white/40'
-                            } backdrop-blur-sm`}
+                                ? 'border-emerald-400 bg-emerald-50 shadow-lg' 
+                                : 'border-gray-200 bg-white hover:border-emerald-300'
+                            }`}
                           >
                             <role.icon className={`w-6 h-6 mb-2 ${
-                              formData.role === role.value ? `text-${role.color}-400` : 'text-gray-400'
+                              formData.role === role.value ? 'text-emerald-600' : 'text-gray-400'
                             }`} />
                             <span className={`text-sm font-medium ${
-                              formData.role === role.value ? 'text-white' : 'text-gray-300'
+                              formData.role === role.value ? 'text-emerald-700' : 'text-gray-600'
                             }`}>
                               {role.value}
                             </span>
@@ -617,101 +581,101 @@ const ScoutApplication: React.FC = () => {
               )}
 
               {currentStep === 2 && (
-                <div className="space-y-8">
+                <div className="space-y-6">
                   <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-white mb-3 flex items-center justify-center gap-2">
-                      <Users className="w-7 h-7 text-emerald-400" />
-                      Your Elite Network
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
+                      <Users className="w-6 h-6 text-emerald-600" />
+                      Who Would You Refer?
                     </h3>
-                    <p className="text-gray-300 mb-6">
-                      Share up to 5 elite professionals you'd recommend for exceptional opportunities
+                    <p className="text-gray-600 mb-4">
+                      Add up to 5 profiles of people you'd recommend for great opportunities
                     </p>
                     <div className="flex flex-wrap gap-3 justify-center">
-                      <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 text-blue-300 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                        <Info className="w-4 h-4" />
-                        Quality over quantity - detailed profiles increase acceptance chances
+                      <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                        <Info className="w-3 h-3" />
+                        You can add up to 5 people. The more detailed, the better your chances of getting accepted.
                       </div>
-                      <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                        <Shield className="w-4 h-4" />
-                        Confidential - we only contact them if you're accepted
+                      <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
+                        <Shield className="w-3 h-3" />
+                        You don't need to tell them yet — we only contact them if you're accepted.
                       </div>
                     </div>
                   </div>
 
                   {formData.referral_profiles.map((profile, index) => (
-                    <Card key={profile.id} className="bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl backdrop-blur-sm overflow-hidden">
-                      <CardHeader className="pb-4 bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border-b border-white/10">
+                    <Card key={profile.id} className="border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                      <CardHeader className="pb-4">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg text-white flex items-center gap-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-blue-400 rounded-full flex items-center justify-center text-sm font-bold text-white">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center text-sm font-bold text-white">
                               {index + 1}
                             </div>
-                            Elite Referral {index + 1} of 5
+                            Referral {index + 1} of 5
                           </CardTitle>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => removeReferralProfile(profile.id)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
                           >
                             <X className="w-4 h-4" />
                           </Button>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-6 p-6">
+                      <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                              <Linkedin className="w-4 h-4 text-blue-400" />
-                              LinkedIn Profile
+                            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                              <Linkedin className="w-4 h-4 text-blue-600" />
+                              LinkedIn URL
                             </Label>
                             <Input
                               value={profile.linkedin_url}
                               onChange={(e) => updateReferralProfile(profile.id, 'linkedin_url', e.target.value)}
                               placeholder="https://linkedin.com/in/theirprofile"
-                              className="h-12 bg-white/5 border-white/20 focus:border-blue-400 focus:ring-blue-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm"
+                              className="h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                              <UserCheck className="w-4 h-4 text-emerald-400" />
-                              Your Relationship
+                            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                              <UserCheck className="w-4 h-4 text-emerald-600" />
+                              How do you know them?
                             </Label>
                             <Input
                               value={profile.relationship}
                               onChange={(e) => updateReferralProfile(profile.id, 'relationship', e.target.value)}
-                              placeholder="Former colleague, mentee, friend..."
-                              className="h-12 bg-white/5 border-white/20 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm"
+                              placeholder="Former colleague, friend, mentee..."
+                              className="h-10 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg"
                             />
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <Briefcase className="w-4 h-4 text-purple-400" />
-                            Ideal Role for Them
+                          <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <Briefcase className="w-4 h-4 text-blue-600" />
+                            What role do you think they'd thrive in?
                           </Label>
                           <Input
                             value={profile.suggested_role}
                             onChange={(e) => updateReferralProfile(profile.id, 'suggested_role', e.target.value)}
-                            placeholder="Senior Software Engineer, Product Manager, Designer..."
-                            className="h-12 bg-white/5 border-white/20 focus:border-purple-400 focus:ring-purple-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm"
+                            placeholder="Software Engineer, Product Manager, Designer..."
+                            className="h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <Star className="w-4 h-4 text-yellow-400" />
-                            Why They're Elite
+                          <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <Star className="w-4 h-4 text-emerald-600" />
+                            Why are they a great hire?
                           </Label>
                           <Textarea
                             value={profile.why_great}
                             onChange={(e) => updateReferralProfile(profile.id, 'why_great', e.target.value)}
-                            placeholder="What makes them exceptional? Their achievements, skills, leadership qualities, unique expertise..."
-                            rows={4}
-                            className="bg-white/5 border-white/20 focus:border-yellow-400 focus:ring-yellow-400/20 rounded-xl text-white placeholder-gray-400 backdrop-blur-sm resize-none"
+                            placeholder="What makes them special? Their skills, achievements, work ethic..."
+                            rows={3}
+                            className="border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg resize-none"
                           />
                         </div>
                       </CardContent>
@@ -723,38 +687,38 @@ const ScoutApplication: React.FC = () => {
                       type="button"
                       variant="outline"
                       onClick={addReferralProfile}
-                      className="w-full h-16 border-2 border-dashed border-white/30 hover:border-emerald-400/50 text-gray-300 hover:text-emerald-300 rounded-2xl bg-white/5 hover:bg-emerald-500/10 backdrop-blur-sm transition-all duration-300"
+                      className="w-full h-12 border-2 border-dashed border-gray-300 hover:border-emerald-400 text-gray-600 hover:text-emerald-600 rounded-xl hover:bg-emerald-50 transition-all duration-200"
                     >
-                      <Plus className="w-5 h-5 mr-3" />
-                      Add Elite Referral ({formData.referral_profiles.length}/5)
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Another Referral ({formData.referral_profiles.length}/5)
                     </Button>
                   )}
 
-                  <div className="flex items-start space-x-4 p-6 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl border border-emerald-500/30 backdrop-blur-sm">
+                  <div className="flex items-start space-x-3 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                     <input
                       type="checkbox"
                       id="trust_agreement"
                       checked={formData.trust_agreement}
                       onChange={(e) => handleInputChange('trust_agreement', e.target.checked)}
                       required
-                      className="mt-1 h-5 w-5 text-emerald-500 focus:ring-emerald-400 border-emerald-400 rounded bg-white/10"
+                      className="mt-1 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-emerald-300 rounded"
                     />
-                    <Label htmlFor="trust_agreement" className="text-sm text-gray-200 cursor-pointer leading-relaxed">
-                      <span className="font-semibold text-emerald-300">Elite Trust Agreement:</span> I commit to only referring individuals I genuinely trust and believe would be exceptional hires for elite opportunities. *
+                    <Label htmlFor="trust_agreement" className="text-sm text-gray-700 cursor-pointer">
+                      I agree to only refer people I genuinely trust and believe would be excellent hires. *
                     </Label>
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-4 pt-8 border-t border-white/10">
+              <div className="flex gap-4 pt-8 border-t border-gray-200">
                 {currentStep > 1 && (
                   <Button
                     type="button"
                     variant="outline"
                     onClick={prevStep}
-                    className="flex-1 h-14 bg-white/5 border-white/20 text-gray-300 hover:bg-white/10 hover:border-white/30 rounded-xl backdrop-blur-sm transition-all duration-300"
+                    className="flex-1 h-12 rounded-xl"
                   >
-                    <ArrowLeft className="w-5 h-5 mr-2" />
+                    <ArrowLeft className="w-4 h-4 mr-2" />
                     Previous
                   </Button>
                 )}
@@ -763,29 +727,19 @@ const ScoutApplication: React.FC = () => {
                   <Button
                     type="button"
                     onClick={nextStep}
-                    className="flex-1 h-14 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-300"
+                    className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
                   >
-                    Continue to Network
-                    <ChevronRight className="w-5 h-5 ml-2" />
+                    Continue
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 ) : (
                   <Button
                     type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting || !formData.trust_agreement}
-                    className="flex-1 h-14 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-300"
+                    className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 mr-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Submitting Elite Application...
-                      </>
-                    ) : (
-                      <>
-                        <Crown className="w-5 h-5 mr-3" />
-                        Submit Elite Application
-                      </>
-                    )}
+                    {isSubmitting ? 'Submitting Application...' : 'Submit Application'}
                   </Button>
                 )}
               </div>
@@ -794,14 +748,13 @@ const ScoutApplication: React.FC = () => {
         </section>
       </div>
 
-      {/* Floating Apply Button for mobile */}
-      <div className="fixed bottom-6 left-6 right-6 md:hidden z-50">
+      {/* Sticky Apply Button for mobile */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-gray-200 md:hidden z-50">
         <Button
           onClick={scrollToForm}
-          className="w-full h-14 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-bold rounded-2xl shadow-2xl shadow-emerald-500/25 backdrop-blur-sm border border-white/20"
+          className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl"
         >
-          <Rocket className="w-5 h-5 mr-2" />
-          Join Elite Network
+          Apply Now
         </Button>
       </div>
     </div>
