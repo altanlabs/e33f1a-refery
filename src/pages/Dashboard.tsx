@@ -32,23 +32,31 @@ export default function Dashboard() {
   useEffect(() => {
     if (session?.user) {
       loadDashboardData();
+    } else if (session === null) {
+      setLoading(false);
     }
-  }, [session?.user]);
+  }, [session]);
 
   const loadDashboardData = async () => {
-    if (!session?.user) return;
+    if (!session?.user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
       setError('');
 
       const userId = session.user.id;
+      console.log('Loading dashboard data for user:', userId);
 
       const [jobs, referrals, applications] = await Promise.all([
         dbHelpers.getJobs(userId),
         dbHelpers.getReferrals(userId),
         dbHelpers.getApplications(userId)
       ]);
+
+      console.log('Dashboard data loaded:', { jobs: jobs.length, referrals: referrals.length, applications: applications.length });
 
       const totalEarnings = referrals
         .filter(r => r.reward_status === 'Released')
@@ -96,7 +104,7 @@ export default function Dashboard() {
       setRecentActivity(allActivity);
     } catch (err) {
       console.error('Error loading dashboard data:', err);
-      setError('Failed to load dashboard data. Please try again.');
+      setError(`Failed to load dashboard data: ${err.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
