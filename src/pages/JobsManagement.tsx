@@ -206,20 +206,45 @@ export default function JobsManagement() {
 
   if (jobs.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="mx-auto max-w-2xl py-16 px-4">
-          <div className="flex flex-col items-center justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6">
-              <Loader2 className="h-8 w-8 text-white animate-spin" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Loading Jobs
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please wait while we fetch your job listings...
-            </p>
-          </div>
+      <div className="mx-auto max-w-7xl py-8 px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            My Jobs
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Manage your job postings and track applications
+          </p>
         </div>
+
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
+          <CardContent className="p-12 text-center">
+            <div className="flex justify-center mb-6">
+              <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full">
+                <Briefcase className="h-12 w-12 text-green-600 dark:text-green-400" />
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              You haven't posted any jobs yet
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+              Ready to find amazing talent? Create your first job posting and start receiving applications and referrals from our network.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild>
+                <Link to="/jobs/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Post Your First Job
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/opportunities">
+                  <Search className="h-4 w-4 mr-2" />
+                  Browse Other Jobs
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

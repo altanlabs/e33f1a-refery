@@ -242,22 +242,44 @@ export default function MyReferrals() {
       {/* Referrals List */}
       <div className="space-y-4">
         {filteredReferrals.length === 0 ? (
-          <Card>
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
             <CardContent className="p-12 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No referrals found
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <Users className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 {searchTerm || statusFilter !== 'all' || rewardFilter !== 'all'
-                  ? 'Try adjusting your filters to see more results.'
-                  : 'Start referring candidates to see them here.'}
+                  ? 'No referrals match your filters'
+                  : 'You haven\'t referred anyone yet'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                {searchTerm || statusFilter !== 'all' || rewardFilter !== 'all'
+                  ? 'Try adjusting your filters to see more results, or browse jobs to make your first referral.'
+                  : 'Browse jobs to get started! Find opportunities that match people in your network and start earning rewards.'}
               </p>
-              <Button asChild>
-                <Link to="/opportunities">
-                  Browse Job Opportunities
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button asChild>
+                  <Link to="/opportunities">
+                    <Search className="h-4 w-4 mr-2" />
+                    Browse Jobs
+                  </Link>
+                </Button>
+                {(searchTerm || statusFilter !== 'all' || rewardFilter !== 'all') && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setSearchTerm('');
+                      setStatusFilter('all');
+                      setRewardFilter('all');
+                    }}
+                  >
+                    <Filter className="h-4 w-4 mr-2" />
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ) : (

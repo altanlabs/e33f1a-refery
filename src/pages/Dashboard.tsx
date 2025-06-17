@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from 'altan-auth';
 import { dbHelpers } from '@/lib/supabase';
@@ -15,7 +14,11 @@ import {
   Eye,
   Calendar,
   Award,
-  Loader2
+  Loader2,
+  Search,
+  FileText,
+  Building,
+  Rocket
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -39,91 +42,56 @@ export default function Dashboard() {
       setLoading(true);
       setError('');
 
-      // Get user role from metadata or default to referrer
-      const userRole = session.user.user_metadata?.role || 'referrer';
-      let calculatedStats = {};
-      let activity: any[] = [];
+      const [jobs, referrals, applications] = await Promise.all([
+        dbHelpers.getJobs(),
+        dbHelpers.getReferrals(),
+        dbHelpers.getApplications()
+      ]);
 
-      switch (userRole) {
-        case 'poster':
-          const [jobs, referrals, applications] = await Promise.all([
-            dbHelpers.getJobs(),
-            dbHelpers.getReferrals(),
-            dbHelpers.getApplications()
-          ]);
+      const totalEarnings = referrals
+        .filter(r => r.reward_status === 'Released')
+        .reduce((sum, r) => sum + (r.job?.reward_amount || 0), 0);
 
-          const userJobs = jobs; 
-          const totalCandidates = referrals.length + applications.length;
-          const interviewingCount = referrals.filter(r => r.status === 'Interviewing').length;
-          
-          calculatedStats = {
-            activeJobs: userJobs.filter(j => j.status === 'Open').length,
-            totalCandidates,
-            interviewsScheduled: interviewingCount,
-            hiredCandidates: referrals.filter(r => r.status === 'Hired').length,
-          };
+      const calculatedStats = {
+        activeJobs: jobs.filter(j => j.status === 'Open').length,
+        totalJobs: jobs.length,
+        
+        totalReferrals: referrals.length,
+        pendingRewards: referrals.filter(r => r.reward_status === 'Pending').length,
+        totalEarnings,
+        successfulHires: referrals.filter(r => r.status === 'Hired').length,
+        
+        totalApplications: applications.length,
+        inProgress: applications.filter(a => a.status === 'Interviewing').length,
+        offers: applications.filter(a => a.status === 'Hired').length,
+      };
 
-          activity = referrals
-            .slice(0, 5)
-            .map(referral => ({
-              type: 'referral',
-              title: `New referral for ${referral.job?.title || 'Unknown Job'}`,
-              description: `${referral.candidate_name} - ${referral.status}`,
-              time: referral.created_at,
-              status: referral.status,
-            }));
-          break;
-
-        case 'referrer':
-          const userReferrals = await dbHelpers.getReferrals();
-          const totalEarnings = userReferrals
-            .filter(r => r.reward_status === 'Released')
-            .reduce((sum, r) => {
-              return sum + (r.job?.reward_amount || 0);
-            }, 0);
-          
-          calculatedStats = {
-            totalReferrals: userReferrals.length,
-            pendingRewards: userReferrals.filter(r => r.reward_status === 'Pending').length,
-            totalEarnings,
-            successfulHires: userReferrals.filter(r => r.status === 'Hired').length,
-          };
-
-          activity = userReferrals
-            .slice(0, 5)
-            .map(referral => ({
-              type: 'status_update',
-              title: `Referral status updated`,
-              description: `${referral.candidate_name} for ${referral.job?.title || 'Unknown Job'} - ${referral.status}`,
-              time: referral.updated_at,
-              status: referral.status,
-            }));
-          break;
-
-        case 'candidate':
-          const userApplications = await dbHelpers.getApplications();
-          
-          calculatedStats = {
-            totalApplications: userApplications.length,
-            inProgress: userApplications.filter(a => a.status === 'Interviewing').length,
-            offers: userApplications.filter(a => a.status === 'Hired').length,
-            rejections: userApplications.filter(a => a.status === 'Rejected').length,
-          };
-
-          activity = userApplications
-            .slice(0, 5)
-            .map(application => ({
-              type: 'application',
-              title: `Application status updated`,
-              description: `${application.job?.title || 'Unknown Job'} - ${application.status}`,
-              time: application.updated_at,
-              status: application.status,
-            }));
-          break;
-      }
+      const allActivity = [
+        ...referrals.slice(0, 3).map(referral => ({
+          type: 'referral',
+          title: `New referral for ${referral.job?.title || 'Unknown Job'}`,
+          description: `${referral.candidate_name} - ${referral.status}`,
+          time: referral.created_at,
+          status: referral.status,
+        })),
+        ...applications.slice(0, 3).map(application => ({
+          type: 'application',
+          title: `Application status updated`,
+          description: `${application.job?.title || 'Unknown Job'} - ${application.status}`,
+          time: application.updated_at,
+          status: application.status,
+        })),
+        ...jobs.slice(0, 2).map(job => ({
+          type: 'job',
+          title: `Job posted`,
+          description: `${job.title} - ${job.status}`,
+          time: job.created_at,
+          status: job.status,
+        }))
+      ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5);
 
       setStats(calculatedStats);
-      setRecentActivity(activity);
+      setRecentActivity(allActivity);
     } catch (err) {
       console.error('Error loading dashboard data:', err);
       setError('Failed to load dashboard data. Please try again.');
@@ -155,142 +123,49 @@ export default function Dashboard() {
     );
   }
 
-  const userRole = session.user.user_metadata?.role || 'referrer';
   const userName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
 
-  const getStatsCards = () => {
-    switch (userRole) {
-      case 'poster':
-        return [
-          {
-            title: 'Active Jobs',
-            value: stats.activeJobs || 0,
-            description: 'Currently open positions',
-            icon: Briefcase,
-            color: 'text-blue-600',
-          },
-          {
-            title: 'Total Candidates',
-            value: stats.totalCandidates || 0,
-            description: 'Applications & referrals',
-            icon: Users,
-            color: 'text-green-600',
-          },
-          {
-            title: 'Interviews Scheduled',
-            value: stats.interviewsScheduled || 0,
-            description: 'Candidates in interview process',
-            icon: Calendar,
-            color: 'text-yellow-600',
-          },
-          {
-            title: 'Hired Candidates',
-            value: stats.hiredCandidates || 0,
-            description: 'Successful placements',
-            icon: Award,
-            color: 'text-purple-600',
-          },
-        ];
+  const statsCards = [
+    {
+      title: 'My Jobs',
+      value: stats.totalJobs || 0,
+      description: `${stats.activeJobs || 0} currently open`,
+      icon: Briefcase,
+      color: 'text-blue-600',
+      href: '/jobs'
+    },
+    {
+      title: 'My Referrals',
+      value: stats.totalReferrals || 0,
+      description: `${stats.successfulHires || 0} successful hires`,
+      icon: Users,
+      color: 'text-green-600',
+      href: '/my-referrals'
+    },
+    {
+      title: 'My Applications',
+      value: stats.totalApplications || 0,
+      description: `${stats.inProgress || 0} in progress`,
+      icon: FileText,
+      color: 'text-purple-600',
+      href: '/my-applications'
+    },
+    {
+      title: 'Total Earnings',
+      value: `$${(stats.totalEarnings || 0).toLocaleString()}`,
+      description: `${stats.pendingRewards || 0} pending rewards`,
+      icon: DollarSign,
+      color: 'text-yellow-600',
+      href: '/payouts'
+    },
+  ];
 
-      case 'referrer':
-        return [
-          {
-            title: 'Total Referrals',
-            value: stats.totalReferrals || 0,
-            description: 'Candidates you\'ve referred',
-            icon: Users,
-            color: 'text-blue-600',
-          },
-          {
-            title: 'Pending Rewards',
-            value: stats.pendingRewards || 0,
-            description: 'Awaiting completion',
-            icon: DollarSign,
-            color: 'text-yellow-600',
-          },
-          {
-            title: 'Total Earnings',
-            value: `$${(stats.totalEarnings || 0).toLocaleString()}`,
-            description: 'From successful referrals',
-            icon: TrendingUp,
-            color: 'text-green-600',
-          },
-          {
-            title: 'Successful Hires',
-            value: stats.successfulHires || 0,
-            description: 'Referrals that got hired',
-            icon: Award,
-            color: 'text-purple-600',
-          },
-        ];
-
-      case 'candidate':
-        return [
-          {
-            title: 'Applications',
-            value: stats.totalApplications || 0,
-            description: 'Jobs you\'ve applied to',
-            icon: Briefcase,
-            color: 'text-blue-600',
-          },
-          {
-            title: 'In Progress',
-            value: stats.inProgress || 0,
-            description: 'Currently interviewing',
-            icon: Calendar,
-            color: 'text-yellow-600',
-          },
-          {
-            title: 'Offers Received',
-            value: stats.offers || 0,
-            description: 'Job offers pending',
-            icon: Award,
-            color: 'text-green-600',
-          },
-          {
-            title: 'Profile Views',
-            value: Math.floor(Math.random() * 50) + 10,
-            description: 'This month',
-            icon: Eye,
-            color: 'text-purple-600',
-          },
-        ];
-
-      default:
-        return [];
-    }
-  };
-
-  const getQuickActions = () => {
-    switch (userRole) {
-      case 'poster':
-        return [
-          { label: 'Post New Job', href: '/jobs/new', icon: Plus },
-          { label: 'View Companies', href: '/companies', icon: Briefcase },
-          { label: 'Manage Jobs', href: '/jobs', icon: Users },
-        ];
-
-      case 'referrer':
-        return [
-          { label: 'Browse Jobs', href: '/jobs', icon: Briefcase },
-          { label: 'My Referrals', href: '/my-referrals', icon: Users },
-          { label: 'View Payouts', href: '/payouts', icon: DollarSign },
-        ];
-
-      case 'candidate':
-        return [
-          { label: 'Find Jobs', href: '/opportunities', icon: Briefcase },
-          { label: 'My Applications', href: '/my-applications', icon: Users },
-          { label: 'Update Profile', href: '/profile', icon: Eye },
-        ];
-
-      default:
-        return [];
-    }
-  };
-
-  const statsCards = getStatsCards();
-  const quickActions = getQuickActions();
+  const quickActions = [
+    { label: 'Browse Jobs', href: '/opportunities', icon: Search, description: 'Find opportunities to refer or apply' },
+    { label: 'Post a Job', href: '/jobs/new', icon: Plus, description: 'Hire talent through referrals' },
+    { label: 'View My Referrals', href: '/my-referrals', icon: Users, description: 'Track your referral progress' },
+    { label: 'View My Applications', href: '/my-applications', icon: FileText, description: 'Check application status' },
+  ];
 
   return (
     <div className="mx-auto max-w-7xl py-6 px-4 space-y-6">
@@ -300,12 +175,9 @@ export default function Dashboard() {
             Welcome back, {userName.split(' ')[0]}!
           </h1>
           <p className="text-muted-foreground">
-            Here's what's happening with your {userRole === 'poster' ? 'hiring' : userRole === 'referrer' ? 'referrals' : 'job search'}.
+            Here's your complete Refery overview - jobs, referrals, and applications all in one place.
           </p>
         </div>
-        <Badge variant="outline" className="capitalize">
-          {userRole}
-        </Badge>
       </div>
 
       {error && (
@@ -328,19 +200,21 @@ export default function Dashboard() {
         {statsCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-              </CardContent>
+            <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer" asChild>
+              <Link to={stat.href}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
+                  <Icon className={`h-4 w-4 ${stat.color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.description}
+                  </p>
+                </CardContent>
+              </Link>
             </Card>
           );
         })}
@@ -351,7 +225,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
-              Common tasks for your role
+              Everything you need to succeed on Refery
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -361,12 +235,17 @@ export default function Dashboard() {
                 <Button
                   key={index}
                   variant="ghost"
-                  className="w-full justify-start"
+                  className="w-full justify-start h-auto p-4"
                   asChild
                 >
                   <Link to={action.href}>
-                    <Icon className="mr-2 h-4 w-4" />
-                    {action.label}
+                    <div className="flex items-start space-x-3">
+                      <Icon className="h-5 w-5 mt-0.5 text-primary" />
+                      <div className="text-left">
+                        <div className="font-medium">{action.label}</div>
+                        <div className="text-sm text-muted-foreground">{action.description}</div>
+                      </div>
+                    </div>
                   </Link>
                 </Button>
               );
@@ -378,7 +257,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>
-              Latest updates and changes
+              Latest updates across all your activities
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -386,7 +265,11 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {recentActivity.map((activity, index) => (
                   <div key={index} className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2" />
+                    <div className={`w-2 h-2 rounded-full mt-2 ${
+                      activity.type === 'referral' ? 'bg-green-500' :
+                      activity.type === 'application' ? 'bg-blue-500' :
+                      'bg-purple-500'
+                    }`} />
                     <div className="flex-1 space-y-1">
                       <p className="text-sm font-medium leading-none">
                         {activity.title}
@@ -402,13 +285,60 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                No recent activity to show.
-              </p>
+              <div className="text-center py-8">
+                <Building className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  No recent activity yet. Get started by browsing jobs or posting your first position!
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Button size="sm" asChild>
+                    <Link to="/opportunities">
+                      <Search className="h-4 w-4 mr-2" />
+                      Browse Jobs
+                    </Link>
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to="/jobs/new">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Post a Job
+                    </Link>
+                  </Button>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {stats.totalJobs === 0 && stats.totalReferrals === 0 && stats.totalApplications === 0 && (
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-8 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                <Rocket className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Welcome to Refery!</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              You're all set up! Start by browsing jobs to refer candidates, applying to positions, or posting your own job openings.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild>
+                <Link to="/opportunities">
+                  <Search className="h-4 w-4 mr-2" />
+                  Browse Jobs
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/jobs/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Post Your First Job
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -200,22 +200,43 @@ export default function MyApplications() {
       {/* Applications List */}
       <div className="space-y-4">
         {filteredApplications.length === 0 ? (
-          <Card>
+          <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-purple-200 dark:border-purple-800">
             <CardContent className="p-12 text-center">
-              <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No applications found
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                  <Briefcase className="h-12 w-12 text-purple-600 dark:text-purple-400" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 {searchTerm || statusFilter !== 'all'
-                  ? 'Try adjusting your filters to see more results.'
-                  : 'Start applying to jobs to see them here.'}
+                  ? 'No applications match your filters'
+                  : 'You haven\'t applied to any jobs yet'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                {searchTerm || statusFilter !== 'all'
+                  ? 'Try adjusting your filters to see more results, or browse jobs to submit your first application.'
+                  : 'Discover amazing opportunities and take the next step in your career. Browse jobs and start applying today!'}
               </p>
-              <Button asChild>
-                <Link to="/opportunities">
-                  Browse Job Opportunities
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button asChild>
+                  <Link to="/opportunities">
+                    <Search className="h-4 w-4 mr-2" />
+                    Browse Jobs
+                  </Link>
+                </Button>
+                {(searchTerm || statusFilter !== 'all') && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setSearchTerm('');
+                      setStatusFilter('all');
+                    }}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ) : (
