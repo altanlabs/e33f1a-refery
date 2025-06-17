@@ -31,6 +31,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAuth } from 'altan-auth';
+import { supabase } from '@/lib/supabase';
 
 export default function Settings() {
   const { session, service } = useAuth();
@@ -84,8 +85,8 @@ export default function Settings() {
       setRoleChanging(true);
       setError(null);
       
-      // Use Supabase directly to update user metadata
-      const { data, error: updateError } = await service.supabase.auth.updateUser({
+      // Use the imported supabase client directly
+      const { data, error: updateError } = await supabase.auth.updateUser({
         data: {
           role: newRole
         }
@@ -296,7 +297,7 @@ export default function Settings() {
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Switch Role
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                     Change your role to access different features and capabilities. You can switch between roles at any time.
                   </p>
                   
