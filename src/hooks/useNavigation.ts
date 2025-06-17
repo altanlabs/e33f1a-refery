@@ -7,6 +7,7 @@ export function useNavigation(user: User | null): NavItem[] {
   return useMemo(() => {
     if (!user) return [];
 
+    // Show all navigation items to every authenticated user
     const allItems: NavItem[] = [
       { href: '/dashboard', label: 'Dashboard', icon: Briefcase },
       { href: '/opportunities', label: 'Browse Jobs', icon: Search },
@@ -18,3 +19,4 @@ export function useNavigation(user: User | null): NavItem[] {
 
     return allItems;
   }, [user]);
+}
