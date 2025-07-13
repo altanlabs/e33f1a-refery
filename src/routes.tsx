@@ -25,6 +25,7 @@ import ScoutApplicationsAdmin from "./pages/ScoutApplicationsAdmin";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import Sitemap from "./pages/Sitemap";
 import NotFound from "./pages/NotFound";
 
 // Auth guard component using stable custom auth
@@ -202,6 +203,10 @@ const routes = [
       {
         path: "contact",
         element: <Contact />,
+      },
+      {
+        path: "sitemap.xml",
+        element: <Sitemap />,
       },
       {
         path: "*",

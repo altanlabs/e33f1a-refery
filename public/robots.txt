@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://refery.io/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /profile/
+Disallow: /auth/
+
+# Allow important public pages
+Allow: /
+Allow: /jobs/
+Allow: /apply
+Allow: /r/
+Allow: /privacy
+Allow: /terms
+Allow: /contact
+
+# Crawl delay (optional - be respectful)
+Crawl-delay: 1
