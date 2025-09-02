@@ -2,13 +2,10 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import NumberFlow from "@number-flow/react";
 import { 
   Users, 
   Briefcase, 
-  DollarSign, 
   Shield, 
-  TrendingUp, 
   CheckCircle,
   ArrowRight,
   Star,
@@ -16,7 +13,6 @@ import {
   Zap,
   Target,
   Award,
-  Globe,
   Rocket
 } from 'lucide-react';
 
@@ -94,13 +90,6 @@ export default function App() {
     },
   ];
 
-  const stats = [
-    { label: 'Active Premium Jobs', value: 2500, icon: Briefcase },
-    { label: 'Successful Placements', value: 15000, icon: CheckCircle },
-    { label: 'Total Rewards Paid', value: 50000000, icon: DollarSign },
-    { label: 'Average Reward', value: 12500, icon: Award },
-  ];
-
   const testimonials = [
     {
       quote: "Refery transformed our hiring. We found our CTO through a referral in just 3 weeks. The quality is unmatched.",
@@ -174,36 +163,6 @@ export default function App() {
                 Become a Vetted Scout
               </Link>
             </Button>
-          </div>
-
-          {/* Floating Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={index} className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 hover:-translate-y-2">
-                  <CardContent className="p-6 text-center">
-                    <Icon className="h-8 w-8 mx-auto mb-3 text-purple-600 dark:text-purple-400" />
-                    <div className="text-3xl font-black text-gray-900 dark:text-white mb-1">
-                      <NumberFlow 
-                        value={stat.value} 
-                        format={{
-                          style: 'decimal',
-                          notation: stat.value >= 1000000 ? 'compact' : 'standard',
-                          compactDisplay: 'short'
-                        }}
-                        suffix={stat.label === 'Total Rewards Paid' ? '+' : '+'}
-                        prefix={stat.label === 'Total Rewards Paid' || stat.label === 'Average Reward' ? '$' : ''}
-                        trend={true}
-                      />
-                    </div>
-                    <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {stat.label}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
           </div>
         </div>
       </section>
