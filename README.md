@@ -4,3 +4,4 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 Start by editing src/pages/index.tsx
 
+Altan - is the test
