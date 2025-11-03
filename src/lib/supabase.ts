@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://database.altan.ai';
-const supabaseKey = 'tenant_da5b0993_a4a7_497e_bdec_1237e9439761';
+const supabaseUrl = 'https://73b81519-cb8.db-pool-europe-west1.altan.ai';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjIwNzc1Mzg5MzYsImlhdCI6MTc2MjE3ODkzNiwiaXNzIjoic3VwYWJhc2UiLCJyb2xlIjoiYW5vbiJ9.kDqVtYhvs6jweD06QcXYZHGfgs6emOLQzRmeTGIPvTw';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
