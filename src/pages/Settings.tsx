@@ -30,7 +30,7 @@ import {
   Crown,
   Sparkles
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
 export default function Settings() {

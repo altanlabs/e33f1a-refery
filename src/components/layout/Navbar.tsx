@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '../../contexts/AuthContext';
 import { Logo } from './navbar/Logo';
 import { NavLinks } from './navbar/NavLinks';
 import { MobileMenu } from './navbar/MobileMenu';

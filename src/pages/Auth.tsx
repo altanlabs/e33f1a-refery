@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, AuthWrapper } from 'altan-auth';
+import { useAuth } from '../contexts/AuthContext';
+import { AuthWrapper } from '../components/auth/AuthWrapper';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Auth() {

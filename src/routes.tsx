@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { useAuth } from 'altan-auth';
+import { useAuth } from './contexts/AuthContext';
 import { Layout } from "./components/layout/Layout";
 import Auth from "./pages/Auth";
 import Index from "./pages/index";

@@ -30,7 +30,7 @@ import {
   Copy,
   Share2
 } from 'lucide-react';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '@/lib/supabase';
 import { format } from 'date-fns';
 

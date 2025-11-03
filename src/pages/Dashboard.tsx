@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from 'altan-auth';
+import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '@/lib/supabase';
 import { 
   Briefcase, 
