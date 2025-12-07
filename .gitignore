@@ -36,3 +36,8 @@ out/
 tsconfig.tsbuildinfo
 bun.lockb
 pnpm-lock.yaml
+
+# Build artifacts and worktree directories (managed by preview API)
+.threads
+.threads/
+.last_install_check
