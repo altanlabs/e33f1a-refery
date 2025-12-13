@@ -384,22 +384,36 @@ export const dbHelpers = {
 
   // Payouts
   async getPayouts() {
-    const { data, error } = await supabase
-      .from('payouts')
-      .select(`
-        *,
-        referral:referrals(
+    try {
+      const user = supabase.auth.user();
+      if (!user) {
+        console.warn('No authenticated user for fetching payouts');
+        return [];
+      }
+      const { data, error } = await supabase
+        .from('payouts')
+        .select(`
           *,
-          job:jobs(
+          referral:referrals(
             *,
-            company:companies(*)
+            job:jobs(
+              *,
+              company:companies(*)
+            )
           )
-        )
-      `)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
+        `)
+        .eq('referral.referrer', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Error fetching payouts:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.warn('Error in getPayouts:', error);
+      return [];
+    }
   },
 
   async createPayout(payout: Database['public']['Tables']['payouts']['Insert']) {
