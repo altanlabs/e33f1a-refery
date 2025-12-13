@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { FileUpload } from '@/components/ui/FileUpload';
 import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '@/lib/supabase';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
@@ -17,7 +16,8 @@ import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 const referralSchema = z.object({
   candidateName: z.string().min(2, 'Name must be at least 2 characters'),
   candidateEmail: z.string().email('Please enter a valid email address'),
-  candidateLinkedin: z.string().url('Please enter a valid LinkedIn URL').optional().or(z.literal('')),
+  candidateLinkedin: z.string().url('Please enter a valid LinkedIn URL'),
+  cvText: z.string().optional().or(z.literal('')),
   recommendation: z.string().min(50, 'Recommendation must be at least 50 characters'),
 });
 
@@ -29,7 +29,6 @@ export default function ReferralForm() {
   const { session } = useAuth();
   const [step, setStep] = useState(1);
   const [job, setJob] = useState<any>(null);
-  const [cv, setCv] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -71,7 +70,8 @@ export default function ReferralForm() {
       await dbHelpers.createReferral({
         candidate_name: data.candidateName,
         candidate_email: data.candidateEmail,
-        candidate_linkedin: data.candidateLinkedin || undefined,
+        candidate_linkedin: data.candidateLinkedin,
+        cv_text: data.cvText || undefined,
         job: jobId,
         recommendation: data.recommendation,
         status: 'Pending',
@@ -212,7 +212,7 @@ export default function ReferralForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="candidateLinkedin">LinkedIn Profile</Label>
+                <Label htmlFor="candidateLinkedin">LinkedIn Profile *</Label>
                 <Input
                   id="candidateLinkedin"
                   type="url"
@@ -225,13 +225,17 @@ export default function ReferralForm() {
               </div>
 
               <div className="space-y-2">
-                <Label>CV/Resume</Label>
-                <FileUpload
-                  onFileSelect={setCv}
-                  accept=".pdf,.doc,.docx"
-                  maxSize={5}
-                  placeholder="Upload candidate's CV (optional)"
+                <Label htmlFor="cvText">CV/Resume (Optional)</Label>
+                <Textarea
+                  id="cvText"
+                  placeholder="Paste the candidate's CV/resume here in text format..."
+                  rows={8}
+                  {...register('cvText')}
+                  className="font-mono text-sm"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Copy and paste the candidate's CV or resume in plain text format
+                </p>
               </div>
 
               <div className="flex justify-end">

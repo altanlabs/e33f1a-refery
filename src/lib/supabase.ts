@@ -85,11 +85,11 @@ export interface Database {
           id: string;
           candidate_name: string;
           candidate_email: string;
-          candidate_linkedin?: string;
+          candidate_linkedin: string;
           job: string;
           recommendation?: string;
           status?: 'Pending' | 'Reviewing' | 'Interviewing' | 'Hired' | 'Rejected';
-          cv?: string;
+          cv_text?: string;
           reward_status?: 'Pending' | 'In Escrow' | 'Released';
           created_at: string;
           updated_at: string;
@@ -99,11 +99,11 @@ export interface Database {
         Insert: {
           candidate_name: string;
           candidate_email: string;
-          candidate_linkedin?: string;
+          candidate_linkedin: string;
           job: string;
           recommendation?: string;
           status?: 'Pending' | 'Reviewing' | 'Interviewing' | 'Hired' | 'Rejected';
-          cv?: string;
+          cv_text?: string;
           reward_status?: 'Pending' | 'In Escrow' | 'Released';
         };
         Update: {
@@ -113,7 +113,7 @@ export interface Database {
           job?: string;
           recommendation?: string;
           status?: 'Pending' | 'Reviewing' | 'Interviewing' | 'Hired' | 'Rejected';
-          cv?: string;
+          cv_text?: string;
           reward_status?: 'Pending' | 'In Escrow' | 'Released';
         };
       };
