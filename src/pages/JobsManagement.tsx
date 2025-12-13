@@ -78,7 +78,10 @@ export default function JobsManagement() {
         dbHelpers.getCompanies()
       ]);
       
-      setJobs(jobsData || []);
+      // Filter to only show jobs created by the current user
+      const userJobs = (jobsData || []).filter(job => job.created_by === session?.user?.id);
+      
+      setJobs(userJobs);
       setCompanies(companiesData || []);
     } catch (err) {
       console.error('Error loading data:', err);
@@ -212,7 +215,7 @@ export default function JobsManagement() {
             My Jobs
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage your job postings and track applications
+            Manage your job postings and track candidate applications and referrals
           </p>
         </div>
 
@@ -249,8 +252,6 @@ export default function JobsManagement() {
     );
   }
 
-  const userRole = (session.user.user_metadata?.role || 'referrer') as 'poster' | 'referrer' | 'candidate';
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="mx-auto max-w-7xl py-8 px-4">
@@ -259,87 +260,78 @@ export default function JobsManagement() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
             <div className="mb-6 lg:mb-0">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3">
-                {userRole === 'poster' ? 'Job Management' : 'Job Board'}
+                My Jobs
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
-                {userRole === 'poster' 
-                  ? 'Create, manage, and track your job postings with powerful analytics'
-                  : userRole === 'referrer'
-                  ? 'Discover amazing opportunities to refer talented candidates and earn substantial rewards'
-                  : 'Find your next career opportunity through trusted referrals and connections'
-                }
+                Manage and track your job postings, monitor candidate applications and referrals
               </p>
             </div>
-            {userRole === 'poster' && (
-              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white border-0 shadow-lg">
-                <Link to="/jobs/new">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Post New Job
-                </Link>
-              </Button>
-            )}
+            <Button asChild size="lg" className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white border-0 shadow-lg">
+              <Link to="/jobs/new">
+                <Plus className="h-5 w-5 mr-2" />
+                Post New Job
+              </Link>
+            </Button>
           </div>
 
           {/* Stats Cards */}
-          {userRole === 'poster' && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-xl transition-all duration-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Total Jobs</p>
-                      <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.total}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                      <Briefcase className="h-6 w-6 text-white" />
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-xl transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Total Jobs</p>
+                    <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.total}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <Briefcase className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 hover:shadow-xl transition-all duration-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-1">Active</p>
-                      <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">{stats.active}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
-                      <TrendingUp className="h-6 w-6 text-white" />
-                    </div>
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 hover:shadow-xl transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-1">Active</p>
+                    <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-100">{stats.active}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 hover:shadow-xl transition-all duration-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-1">Paused</p>
-                      <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.paused}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-                      <Clock className="h-6 w-6 text-white" />
-                    </div>
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 hover:shadow-xl transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mb-1">Paused</p>
+                    <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.paused}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
+                    <Clock className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 hover:shadow-xl transition-all duration-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Closed</p>
-                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.closed}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
-                      <AlertCircle className="h-6 w-6 text-white" />
-                    </div>
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 hover:shadow-xl transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Closed</p>
+                    <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.closed}</p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+                  <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
+                    <AlertCircle className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {error && (
@@ -531,41 +523,30 @@ export default function JobsManagement() {
                   {/* Action Buttons */}
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex gap-2">
-                      {userRole === 'poster' ? (
-                        <>
-                          <Button variant="outline" size="sm" asChild className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                            <Link to={`/jobs/${job.id}/edit`}>
-                              <Edit className="h-3 w-3 mr-1" />
-                              Edit
-                            </Link>
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleDeleteJob(job.id)}
-                            className="border-red-200 text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            Delete
-                          </Button>
-                        </>
-                      ) : userRole === 'referrer' ? (
-                        <Button size="sm" asChild className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white border-0">
-                          <Link to={`/refer/${job.id}`}>
-                            <Users className="h-3 w-3 mr-1" />
-                            Refer Someone
-                          </Link>
-                        </Button>
-                      ) : (
-                        <Button size="sm" asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0">
-                          <Link to={`/apply/${job.id}`}>
-                            Apply Now
-                          </Link>
-                        </Button>
-                      )}
+                      <Button variant="outline" size="sm" asChild className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20">
+                        <Link to={`/jobs/${job.id}/candidates`}>
+                          <Users className="h-3 w-3 mr-1" />
+                          View Candidates
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/20">
+                        <Link to={`/jobs/${job.id}/edit`}>
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleDeleteJob(job.id)}
+                        className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Delete
+                      </Button>
                     </div>
                     
-                    <Button variant="ghost" size="sm" asChild className="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50">
+                    <Button variant="ghost" size="sm" asChild className="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 dark:text-gray-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-900/20">
                       <Link to={`/jobs/${job.id}`}>
                         <Eye className="h-4 w-4 mr-1" />
                         View Details
@@ -586,21 +567,8 @@ export default function JobsManagement() {
                 No jobs found
               </h3>
               <p className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-md mx-auto">
-                {jobs.length === 0 
-                  ? userRole === 'poster' 
-                    ? 'Ready to get started? Create your first job posting and start finding amazing candidates.'
-                    : 'No jobs are currently available. Check back soon for new opportunities!' 
-                  : 'No jobs match your current filters. Try adjusting your search criteria to see more results.'
-                }
+                No jobs match your current filters. Try adjusting your search criteria to see more results.
               </p>
-              {userRole === 'poster' && jobs.length === 0 && (
-                <Button asChild size="lg" className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white border-0 shadow-lg">
-                  <Link to="/jobs/new">
-                    <Plus className="h-5 w-5 mr-2" />
-                    Post Your First Job
-                  </Link>
-                </Button>
-              )}
             </CardContent>
           </Card>
         )}

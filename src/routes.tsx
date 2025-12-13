@@ -9,6 +9,7 @@ import JobsManagement from "./pages/JobsManagement";
 import Companies from "./pages/Companies";
 import NewJob from "./pages/NewJob";
 import EditJob from "./pages/EditJob";
+import JobCandidates from "./pages/JobCandidates";
 import ReferralForm from "./pages/ReferralForm";
 import MyReferrals from "./pages/MyReferrals";
 import MyApplications from "./pages/MyApplications";
@@ -28,14 +29,13 @@ import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
 import NotFound from "./pages/NotFound";
 
-// Auth guard component using stable custom auth
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session } = useAuth();
-  
+
   if (!session?.user) {
     return <Navigate to="/auth" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -113,6 +113,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <EditJob />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "jobs/:jobId/candidates",
+        element: (
+          <ProtectedRoute>
+            <JobCandidates />
           </ProtectedRoute>
         ),
       },
